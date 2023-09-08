@@ -5,6 +5,11 @@
 {% block content %}
 <ul>
     {% for order in data.orders %}
+        <div class="card">
+            <img src={{order.srcIMG}} alt="Image">
+            <h3>{{order.title}}</h3>
+            <p>{{order.description}}</p>
+        </div>
         {% include 'order_element.html' with element=order %}
     {% empty %}
         <li>Список пуст</li>

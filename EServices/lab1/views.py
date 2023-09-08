@@ -8,10 +8,10 @@ def hello(request):
 
 def GetOrders(request):
     return render(request, 'orders.html', {'data' : {'current_date': date.today(),'orders': [
-            {'title': 'Книга с картинками', 'id': 1},
-            {'title': 'Бутылка с водой', 'id': 2},
-            {'title': 'Коврик для мышки', 'id': 3},
-        ]
+            {'title': 'Участник №1', 'description': 'Описание №1', 'srcIMG': '../static/images/MAN.jpg','id': 1},
+            {'title': 'Участник №2', 'description': 'Описание №2', 'srcIMG': '../static/images/MAN2.jpg','id': 2},
+            {'title': 'Участник №3', 'description': 'Описание №3', 'srcIMG': '../static/images/MAN3.jpg','id': 3},
+            ]
     }})
 
 def GetOrder(request, id):

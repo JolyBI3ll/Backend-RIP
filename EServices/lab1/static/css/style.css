@@ -12,3 +12,26 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
 }
+
+.card {
+  width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.card img {
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+}
+
+.card h3 {
+  margin-top: 10px;
+}
+
+.card p {
+  margin: 10px 0;
+}
