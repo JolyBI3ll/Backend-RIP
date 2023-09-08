@@ -1,0 +1,19 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en" class="h-100">
+<head>
+  <meta charset="utf-8">
+    <title>{% block title %}{% endblock %}</title> 
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class = "title-text">Hello BMSTU students! Today is {{data.current_date}}</div>
+    {% block content %}{% endblock %}
+    <form action="sendText" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input name="text" type="text"><br><br>
+      <input type="submit" value="Submit" >
+  </form>
+</body>
+</html>
