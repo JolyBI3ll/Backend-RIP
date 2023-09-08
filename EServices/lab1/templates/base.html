@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <div class = "title-text">Hello BMSTU students! Today is {{data.current_date}}</div>
+    <div class = "title-text">Добро пожаловать на сайт Emporia Sport!</div>
     {% block content %}{% endblock %}
     <form action="sendText" method="post" enctype="multipart/form-data">
       {% csrf_token %}

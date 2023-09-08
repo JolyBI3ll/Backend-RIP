@@ -6,3 +6,9 @@
     font-size: 40px;
     text-align: center;
 }
+
+body {
+  background-image: url("../images/BackroundIMG.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
