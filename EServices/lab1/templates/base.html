@@ -9,6 +9,8 @@
 </head>
 <body>
     <div class = "title-text">Добро пожаловать на сайт Emporia Sport!</div>
+    <div class = "order-text">Данный сайт позволяет вам набрать команду для соревнования и зарегистрироваться на него, 
+    а также можете регистрировать новых учатсников!</div>
     {% block content %}{% endblock %}
     <form action="sendText" method="post" enctype="multipart/form-data">
       {% csrf_token %}
