@@ -14,8 +14,13 @@ body {
   background-size: cover;
 }
 
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .card {
-  width: 300px;
+  width: 20%;
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 10px;
@@ -35,4 +40,22 @@ body {
 
 .card p {
   margin: 10px 0;
+}
+.find-element {
+  margin-left: 7.5%;
+}
+.card-button {
+  /* display: flex; */
+  /* align-items: center; */
+  /* justify-content: center; */
+  width: 10%;
+  text-decoration: none;
+  color: #ffffff;
+  background-color: #333333;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.card-button:hover {
+  background-color: #555555;
 }
