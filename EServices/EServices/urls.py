@@ -21,10 +21,8 @@ from lab1 import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('hello/', views.hello),
-    path('', views.GetOrders),
-    path('order/<int:id>/', views.GetOrder, name='order_url'),
-    path('sendText', views.sendText, name='sendText'),
-    path('order/<int:id>/sendText', views.sendText, name='sendText'),
-
+    path('', views.GetParts, name = 'base_url'),
+    path('participants/<int:id>/', views.GetPart, name='participants_url'),
+    path('find', views.find),
+    # path('order/<int:id>/sendText', views.sendText, name='sendText'),
 ]
