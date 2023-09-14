@@ -8,9 +8,13 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <div class="title-text"><h1>Подробности о кандидате №{{ data.participants.id }}</h1></div>
+    <div class="title-text"><h1>{{ data.participants.title }}</h1></div>
     <div>
-
+      <img class = "image" src="{% static data.participants.img %}" alt="Image">
+      <p class = "title-text">Дата рождения: {{data.participants.BDate}}
+        <br>
+        Вид спортивного занятия: {{data.participants.Sport}}
+      </p>
     </div>
 </body>
 </html>

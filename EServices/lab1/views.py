@@ -8,9 +8,9 @@ def GetData():
     return {
         'data' : {
             'participants' : [
-                {'title' : 'Теряева Ксения Владимировна','BDate' : '23.06.2003', 'img' : 'images/MAN.jpg', 'id' : 1},
-                {'title' : 'Малютин Илья Дмитриевич','BDate' : '19.06.2003', 'img' : 'images/MAN2.jpg', 'id' : 2},
-                {'title' : 'Угрюмов Михаил Андреевич','BDate' : '13.06.2003', 'img' : 'images/MAN3.jpg', 'id' : 3},
+                {'title' : 'Теряева Ксения Владимировна','BDate' : '23.06.2003','Sport' : 'Волейбол', 'img' : 'images/MAN.jpg', 'id' : 1},
+                {'title' : 'Малютин Илья Дмитриевич','BDate' : '19.06.2003','Sport' : 'Футбол', 'img' : 'images/MAN2.jpg', 'id' : 2},
+                {'title' : 'Угрюмов Михаил Андреевич','BDate' : '13.06.2003','Sport' : 'Плавание', 'img' : 'images/MAN3.jpg', 'id' : 3},
             ]
         }
     }

@@ -24,5 +24,4 @@ urlpatterns = [
     path('', views.GetParts, name = 'base_url'),
     path('participants/<int:id>/', views.GetPart, name='participants_url'),
     path('find', views.find),
-    # path('order/<int:id>/sendText', views.sendText, name='sendText'),
 ]
