@@ -51,6 +51,19 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'EServices.urls'
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'participants',
+        'USER': 'client',
+        'PASSWORD': 'mypassword',
+        'HOST': 'localhost',
+        'PORT': 5432,
+        'OPTIONS': {'charset': 'utf8'},
+        'TEST_CHARSET': 'utf8',
+    }
+}
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
