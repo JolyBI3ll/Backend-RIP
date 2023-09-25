@@ -1,3 +1,36 @@
 from django.db import models
-
+from django.core.validators import MinValueValidator, MaxValueValidator
 # Create your models here.
+class Participant(models.Model):
+    full_name = models.CharField(max_length=50, verbose_name="ФИО")
+    link = models.CharField(max_length=50, verbose_name="Ссылка на изображение", null = True, blank=True)
+    status = models.CharField(max_length=1, verbose_name="Статус активности") #A - active, N - inactive 
+    bdate = models.DateField(verbose_name="День рождения")
+    sport = models.CharField(max_length=20, verbose_name="Тип занятия")
+    description = models.CharField(max_length=255, verbose_name="Описание", null = True, blank=True)
+    power = models.IntegerField(verbose_name="Сила",validators=[MinValueValidator(0), MaxValueValidator(10)], null = True, blank=True) #rating from 0 to 10
+    agility = models.IntegerField(verbose_name="Ловкость",validators=[MinValueValidator(0), MaxValueValidator(10)], null = True, blank=True)
+    endurance = models.IntegerField(verbose_name="Выносливость",validators=[MinValueValidator(0), MaxValueValidator(10)], null = True, blank=True)
+
+class User(models.Model):
+    name = models.CharField(max_length=20, verbose_name="Имя")
+    login = models.CharField(max_length=20, verbose_name="Логин")
+    password = models.CharField(max_length=50, verbose_name="Пароль")
+
+class Moderator(models.Model):
+    name = models.CharField(max_length=20, verbose_name="Имя")
+    login = models.CharField(max_length=20, verbose_name="Логин")
+    password = models.CharField(max_length=50, verbose_name="Пароль")
+
+class Request(models.Model):
+    created = models.DateTimeField(auto_now=True, verbose_name="Создание")
+    send = models.DateTimeField(verbose_name="Отправка")
+    closed = models.DateTimeField(verbose_name="Закрытие")
+    status = models.CharField(max_length=20, verbose_name="Статус") # I - inputing, P - processing, D - deleted by user, A - success, W - fail
+    user = models.ForeignKey(User, on_delete = models.CASCADE, verbose_name="Пользователь")
+    moderator = models.ForeignKey(Moderator, on_delete = models.CASCADE, verbose_name="Модератор")
+
+class OrdersProducts(models.Model):
+    product_cnt = models.IntegerField(verbose_name="Количество данного товара в данном заказе")
+    Participant = models.ForeignKey(Participant, on_delete = models.CASCADE, verbose_name="Участник")
+    Request = models.ForeignKey(Request, on_delete = models.CASCADE, verbose_name="Заявка")
