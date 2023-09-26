@@ -24,4 +24,5 @@ urlpatterns = [
     path('', views.GetParts, name = 'base_url'),
     path('participants/<int:id>/', views.GetPart, name='participants_url'),
     path('find', views.find),
+    path('delete', views.deleteFromParts),
 ]

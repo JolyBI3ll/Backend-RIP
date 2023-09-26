@@ -20,6 +20,21 @@
   height: 45%;
 }
 
+.card-delete-input {
+  display: none;
+}
+
+.card-delete-button {
+  margin-top: 20px;
+  padding: 6px;
+  background-color: coral;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  text-transform: uppercase;
+}
 
 .title-text h1{
   font-size: 40px;

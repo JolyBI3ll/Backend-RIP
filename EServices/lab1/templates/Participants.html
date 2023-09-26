@@ -6,12 +6,20 @@
 <ul>
     <div class = "card-container">
         {% for participant in data.participants %}
+            {% if participant.status == 'A' %}
             <div class="card">
                 <a href="{% url 'participants_url' participant.id %}" class = "card-button">
-                    <img src="{% static participant.img %}" alt="Image">
-                    <h3>{{participant.title}}</h3>
-                    <p>Вид спорта: {{participant.Sport}}</p>
+                    <img src="{% static participant.link %}" alt="Image">
+                    <h3>{{participant.full_name}}</h3>
+                    <p>Вид спорта: {{participant.sport}}</p>
+                    <form action="delete" method="post">
+                        {% csrf_token %}
+                        <input class="card-delete-input" type="text" name="delete_card" value="{{participant.id}}">
+                        <input class="card-delete-button" type="submit" value="удалить">
+                    </form>
                 </a>
+                
+            {% endif %}
             </div>
         {% empty %}
             <li>Список пуст</li>
