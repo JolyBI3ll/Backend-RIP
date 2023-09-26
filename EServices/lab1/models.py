@@ -11,6 +11,7 @@ class Participant(models.Model):
     power = models.IntegerField(verbose_name="Сила",validators=[MinValueValidator(0), MaxValueValidator(10)], null = True, blank=True) #rating from 0 to 10
     agility = models.IntegerField(verbose_name="Ловкость",validators=[MinValueValidator(0), MaxValueValidator(10)], null = True, blank=True)
     endurance = models.IntegerField(verbose_name="Выносливость",validators=[MinValueValidator(0), MaxValueValidator(10)], null = True, blank=True)
+    last_modified = models.DateTimeField(auto_now=True, verbose_name="Последнее изменение", null=True, blank=True)
 
 class User(models.Model):
     name = models.CharField(max_length=20, verbose_name="Имя")
@@ -30,7 +31,6 @@ class Request(models.Model):
     user = models.ForeignKey(User, on_delete = models.CASCADE, verbose_name="Пользователь")
     moderator = models.ForeignKey(Moderator, on_delete = models.CASCADE, verbose_name="Модератор")
 
-class OrdersProducts(models.Model):
-    product_cnt = models.IntegerField(verbose_name="Количество данного товара в данном заказе")
+class RequestParticipant(models.Model):
     Participant = models.ForeignKey(Participant, on_delete = models.CASCADE, verbose_name="Участник")
     Request = models.ForeignKey(Request, on_delete = models.CASCADE, verbose_name="Заявка")

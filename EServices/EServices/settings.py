@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['*']
 STATICFILES_DIRS = ['lab1/static']
 STATIC_URL = '/static/'
 INSTALLED_APPS = [
+    'lab1',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -51,18 +52,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'EServices.urls'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'participants',
-        'USER': 'client',
-        'PASSWORD': 'mypassword',
-        'HOST': 'localhost',
-        'PORT': 5432,
-        'OPTIONS': {'charset': 'utf8'},
-        'TEST_CHARSET': 'utf8',
-    }
-}
 
 TEMPLATES = [
     {
@@ -88,8 +77,12 @@ WSGI_APPLICATION = 'EServices.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'participants',
+        'USER': 'client',
+        'PASSWORD': 'mypassword',
+        'HOST': 'localhost',
+        'PORT': 5432,
     }
 }
 
