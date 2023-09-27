@@ -21,7 +21,6 @@ from lab1 import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.GetParts, name = 'base_url'),
     path('participants/<int:id>/', views.GetPart, name='participants_url'),
-    path('find', views.find),
+    path('', views.find),
 ]

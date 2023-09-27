@@ -11,14 +11,14 @@
     <div class="title-text"><h1>{{ data.participants.title }}</h1></div>
     <div>
       <img class = "image" src="{% static data.participants.img %}" alt="Image">
-      <p class = "title-text">Дата рождения: {{data.participants.BDate}}
-        <br>
-        Вид спортивного занятия: {{data.participants.Sport}}<br>
-        Сила: {{data.participants.Power}}<br>
-        Ловкость: {{data.participants.Agility}}<br>
-        Выносливость: {{data.participants.Endurance}}<br>
-        Описание: {{data.participants.Description}}
+      <p class = "title-text">
+        Дата рождения: {{data.participants.BDate}}<br>
+        Вес: {{data.participants.weight}} кг<br>
+        Рост: {{data.participants.Height}} см<br>
+        <div class = "bold">Описание</div><br> 
+        <div class = "title-text">{{data.participants.Description}}</div>
       </p>
+      <a href = "../../" class = "button">Назад</a>
     </div>
 </body>
 </html>

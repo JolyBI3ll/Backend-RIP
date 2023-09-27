@@ -4,7 +4,6 @@
     letter-spacing: 1px;
     margin-left: 5%;
 }
-
 .url-text{
   text-align: left;
   font-family: 'Times New Roman', Times, serif;
@@ -20,6 +19,23 @@
   height: 45%;
 }
 
+.bold{
+  font-weight:bolder;
+  color: black;
+  top: -20px;
+  font-size: 20px;
+  text-align: left;
+  font-family: 'Times New Roman', Times, serif;
+  letter-spacing: 1px;
+  margin-left: 5%;
+}
+.button{
+  margin-left: 5%;
+  text-decoration: none;
+  background-color: coral;
+  color: white;
+  border-radius: 5px;
+}
 
 .title-text h1{
   font-size: 40px;

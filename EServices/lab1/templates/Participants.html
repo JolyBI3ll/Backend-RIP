@@ -10,7 +10,6 @@
                 <a href="{% url 'participants_url' participant.id %}" class = "card-button">
                     <img src="{% static participant.img %}" alt="Image">
                     <h3>{{participant.title}}</h3>
-                    <p>Вид спорта: {{participant.Sport}}</p>
                 </a>
             </div>
         {% empty %}
