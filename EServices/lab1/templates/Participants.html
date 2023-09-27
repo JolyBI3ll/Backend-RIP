@@ -11,7 +11,6 @@
                 <a href="{% url 'participants_url' participant.id %}" class = "card-button">
                     <img src="{% static participant.link %}" alt="Image">
                     <h3>{{participant.full_name}}</h3>
-                    <p>Вид спорта: {{participant.sport}}</p>
                     <form action="delete" method="post">
                         {% csrf_token %}
                         <input class="card-delete-input" type="text" name="delete_card" value="{{participant.id}}">

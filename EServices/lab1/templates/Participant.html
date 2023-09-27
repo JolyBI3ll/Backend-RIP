@@ -11,13 +11,12 @@
     <div class="title-text"><h1>{{ data.participants.full_name }}</h1></div>
     <div>
       <img class = "image" src="{% static data.participants.link %}" alt="Image">
-      <p class = "title-text">Дата рождения: {{data.participants.bdate}}
-        <br>
-        Вид спортивного занятия: {{data.participants.sport}}<br>
-        Сила: {{data.participants.power}}<br>
-        Ловкость: {{data.participants.agility}}<br>
-        Выносливость: {{data.participants.endurance}}<br>
-        Описание: {{data.participants.description}}
+      <p class = "title-text">
+        Дата рождения: {{data.participants.bdate}}<br>
+        Рост: {{data.participants.height}}<br>
+        Вес: {{data.participants.weight}}<br>
+        <div class = "bold">Описание</div><br> 
+        <div class = "title-text">{{data.participants.description}}</div>
       </p>
     </div>
 </body>

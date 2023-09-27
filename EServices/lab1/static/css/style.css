@@ -24,6 +24,17 @@
   display: none;
 }
 
+.bold{
+  font-weight:bolder;
+  color: black;
+  top: -20px;
+  font-size: 20px;
+  text-align: left;
+  font-family: 'Times New Roman', Times, serif;
+  letter-spacing: 1px;
+  margin-left: 5%;
+}
+
 .card-delete-button {
   margin-top: 20px;
   padding: 6px;
