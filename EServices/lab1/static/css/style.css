@@ -24,6 +24,14 @@
   display: none;
 }
 
+.button{
+  margin-left: 5%;
+  text-decoration: none;
+  background-color: coral;
+  color: white;
+  border-radius: 5px;
+}
+
 .bold{
   font-weight:bolder;
   color: black;
