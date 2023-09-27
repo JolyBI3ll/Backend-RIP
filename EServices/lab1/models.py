@@ -24,7 +24,8 @@ class Request(models.Model):
     send = models.DateTimeField(verbose_name="Отправка")
     closed = models.DateTimeField(verbose_name="Закрытие")
     status = models.CharField(max_length=20, verbose_name="Статус") # I - inputing, P - processing, D - deleted by user, A - success, W - fail
-    user = models.ForeignKey(User, on_delete = models.CASCADE, verbose_name="Пользователь")
+    user_id = models.ForeignKey(User, on_delete = models.CASCADE, verbose_name="ID_Пользователь", related_name='user_id')
+    moder_id = models.ForeignKey(User, on_delete = models.CASCADE, verbose_name="ID_Модератор", related_name='moder_id')
 
 class RequestParticipant(models.Model):
     Participant = models.ForeignKey(Participant, on_delete = models.CASCADE, verbose_name="Участник")
