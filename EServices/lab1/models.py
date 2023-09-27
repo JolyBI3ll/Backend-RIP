@@ -1,16 +1,13 @@
 from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
 # Create your models here.
 class Participant(models.Model):
     full_name = models.CharField(max_length=50, verbose_name="ФИО")
     link = models.CharField(max_length=50, verbose_name="Ссылка на изображение", null = True, blank=True)
     status = models.CharField(max_length=1, verbose_name="Статус активности") #A - active, N - inactive 
     bdate = models.DateField(verbose_name="День рождения")
-    sport = models.CharField(max_length=20, verbose_name="Тип занятия")
+    height = models.CharField(max_length=20, verbose_name="Рост")
+    weight = models.CharField(max_length=20, verbose_name="Вес")
     description = models.CharField(max_length=255, verbose_name="Описание", null = True, blank=True)
-    power = models.IntegerField(verbose_name="Сила",validators=[MinValueValidator(0), MaxValueValidator(10)], null = True, blank=True) #rating from 0 to 10
-    agility = models.IntegerField(verbose_name="Ловкость",validators=[MinValueValidator(0), MaxValueValidator(10)], null = True, blank=True)
-    endurance = models.IntegerField(verbose_name="Выносливость",validators=[MinValueValidator(0), MaxValueValidator(10)], null = True, blank=True)
     last_modified = models.DateTimeField(auto_now=True, verbose_name="Последнее изменение", null=True, blank=True)
 
 class User(models.Model):

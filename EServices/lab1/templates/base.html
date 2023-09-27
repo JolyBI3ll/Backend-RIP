@@ -9,13 +9,12 @@
 </head>
 <body>
     <div class = "title-text">
-      <a href = "{% url 'base_url'%}" class = "url-text">Emporia Sport</a>
+      <div class = "url-text">Emporia Sport</div>
       <p>Регистрация участников на соревнования</p>
     </div>
     <br>
-    <form class = "find-element" action="find" method="get" enctype="multipart/form-data">
-      {% csrf_token %}
-      <input name="search" type="text">
+    <form class = "find-element" action="" method="get" enctype="multipart/form-data">
+      <input name="participant" type="text" value="{{ data.input }}">
       <input type="submit" value="Поиск">
     </form>
     {% block content %}{% endblock %}

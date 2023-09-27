@@ -20,10 +20,13 @@ def GetPart(request, id):
 def find(request):
     data = Participant.objects.all()
     try:
-       input = request.GET['search']
+       input = request.GET['participant']
     except:
         input = ''
-    return render(request, 'Participants.html', {'data' : {'participants' : Participant.objects.filter(full_name__startswith = input)}})
+    return render(request, 'Participants.html', {'data' : {
+        'participants' : Participant.objects.filter(full_name__startswith = input),
+        'input' : input,
+        }})
 
 def deleteFromParts(request):
     id = -1
