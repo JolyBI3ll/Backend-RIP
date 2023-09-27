@@ -17,11 +17,7 @@ class User(models.Model):
     name = models.CharField(max_length=20, verbose_name="Имя")
     login = models.CharField(max_length=20, verbose_name="Логин")
     password = models.CharField(max_length=50, verbose_name="Пароль")
-
-class Moderator(models.Model):
-    name = models.CharField(max_length=20, verbose_name="Имя")
-    login = models.CharField(max_length=20, verbose_name="Логин")
-    password = models.CharField(max_length=50, verbose_name="Пароль")
+    is_manager = models.BooleanField(default = False)
 
 class Request(models.Model):
     created = models.DateTimeField(auto_now=True, verbose_name="Создание")
@@ -29,7 +25,6 @@ class Request(models.Model):
     closed = models.DateTimeField(verbose_name="Закрытие")
     status = models.CharField(max_length=20, verbose_name="Статус") # I - inputing, P - processing, D - deleted by user, A - success, W - fail
     user = models.ForeignKey(User, on_delete = models.CASCADE, verbose_name="Пользователь")
-    moderator = models.ForeignKey(Moderator, on_delete = models.CASCADE, verbose_name="Модератор")
 
 class RequestParticipant(models.Model):
     Participant = models.ForeignKey(Participant, on_delete = models.CASCADE, verbose_name="Участник")

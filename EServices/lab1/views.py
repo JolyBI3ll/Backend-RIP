@@ -19,15 +19,11 @@ def GetPart(request, id):
 
 def find(request):
     data = Participant.objects.all()
-    res = {'data' : {'participants' : []}}
     try:
        input = request.GET['search']
     except:
         input = ''
-    for participant in data:
-        if str(participant['full_name']).lower().find(input.lower()) != -1:
-            res['data']['participants'].append(participant)
-    return render(request, 'Participants.html', res)
+    return render(request, 'Participants.html', {'data' : {'participants' : Participant.objects.filter(full_name__startswith = input)}})
 
 def deleteFromParts(request):
     id = -1
