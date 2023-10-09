@@ -1,5 +1,5 @@
 from django.db import models
-
+# Create your models here.
 class Participant(models.Model):
     full_name = models.CharField(max_length=50, verbose_name="ФИО")
     link = models.CharField(max_length=50, verbose_name="Ссылка на изображение", null = True, blank=True)
@@ -25,5 +25,9 @@ class Request(models.Model):
     moder_id = models.ForeignKey(User, on_delete = models.CASCADE, verbose_name="ID_Модератор", related_name='moder_id')
 
 class RequestParticipant(models.Model):
+    Participant_count = models.IntegerField(verbose_name="Количество участников в данном запросе", default = 0)
     Participant = models.ForeignKey(Participant, on_delete = models.CASCADE, verbose_name="Участник")
     Request = models.ForeignKey(Request, on_delete = models.CASCADE, verbose_name="Заявка")
+
+    class Meta:
+        unique_together = (('Participant', 'Request'),)
