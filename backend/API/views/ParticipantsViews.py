@@ -18,3 +18,19 @@ def post_Participants(request, format=None):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['Get'])
+def get_Participants_detail(request, key, format = None):
+    participant = get_object_or_404(Participant,pk=key)
+    if request.method == 'GET':
+        serializer = ParticipantsSerializer(participant)
+        return Response(serializer.data)
+    
+@api_view(['Put'])
+def put_Participants_detail(request, key, format = None):
+    participant = get_object_or_404(Participant, pk=key)
+    serializer = ParticipantsSerializer(participant, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status = status.HTTP_202_ACCEPTED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

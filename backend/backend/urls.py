@@ -25,5 +25,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path(r'participants/', get_Participants, name='participants-get'),
     path(r'participants/post/', post_Participants, name='participants-post'),
+    path(r'participants/<int:key>/', get_Participants_detail, name='participants-detail'),
+    path(r'participants/<int:key>/put/', put_Participants_detail, name='participants-put'),
     path('admin/', admin.site.urls),
 ]
