@@ -34,3 +34,19 @@ def put_Participants_detail(request, key, format = None):
         serializer.save()
         return Response(serializer.data, status = status.HTTP_202_ACCEPTED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['Put'])
+def delete_Participant_detail(request, key, format = None):
+    participant = get_object_or_404(Participant, pk=key)
+    participant.status = 'N'
+    participant.save()
+    serializer = ParticipantsSerializer(participant)
+    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+@api_view(['Put'])
+def restore_Participant_detail(request, key, format = None):
+    participant = get_object_or_404(Participant, pk=key)
+    participant.status = 'A'
+    participant.save()
+    serializer = ParticipantsSerializer(participant)
+    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)

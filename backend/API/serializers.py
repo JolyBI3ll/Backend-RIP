@@ -21,3 +21,8 @@ class RequestParticipantSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestParticipant
         fields = '__all__'
+
+class PositionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RequestParticipant
+        fields = ["Participant_count","Participant"]
