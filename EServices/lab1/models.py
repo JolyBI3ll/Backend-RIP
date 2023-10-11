@@ -25,7 +25,6 @@ class Request(models.Model):
     moder_id = models.ForeignKey(User, on_delete = models.CASCADE, verbose_name="ID_Модератор", related_name='moder_id')
 
 class RequestParticipant(models.Model):
-    Participant_count = models.IntegerField(verbose_name="Количество участников в данном запросе", default = 0)
     Participant = models.ForeignKey(Participant, on_delete = models.CASCADE, verbose_name="Участник")
     Request = models.ForeignKey(Request, on_delete = models.CASCADE, verbose_name="Заявка")
 
