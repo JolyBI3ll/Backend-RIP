@@ -24,13 +24,13 @@ def find(request):
     except:
         input = ''
     return render(request, 'Participants.html', {'data' : {
-        'participants' : Participant.objects.filter(full_name__startswith = input),
+        'participants' : Participant.objects.filter(full_name__startswith = input, status__startswith = 'A'),
         'input' : input,
         }})
 
 def deleteFromParts(request):
     id = -1
-    data = Participant.objects.all()
+    data = Participant.objects.filter(status__startswith = 'A')
     if 'delete_card' in request.POST.keys():
         id = request.POST['delete_card']
     if id != -1:

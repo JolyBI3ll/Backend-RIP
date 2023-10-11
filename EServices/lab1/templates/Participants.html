@@ -6,7 +6,6 @@
 <ul>
     <div class = "card-container">
         {% for participant in data.participants %}
-            {% if participant.status == 'A' %}
             <div class="card">
                 <a href="{% url 'participants_url' participant.id %}" class = "card-button">
                     <img src="{% static participant.link %}" alt="Image">
@@ -17,7 +16,6 @@
                         <input class="card-delete-button" type="submit" value="удалить">
                     </form>
                 </a>
-            {% endif %}
             </div>
         {% empty %}
             <li>Список пуст</li>
