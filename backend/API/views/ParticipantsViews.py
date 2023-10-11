@@ -38,15 +38,7 @@ def put_Participants_detail(request, key, format = None):
 @api_view(['Put'])
 def delete_Participant_detail(request, key, format = None):
     participant = get_object_or_404(Participant, pk=key)
-    participant.status = 'N'
-    participant.save()
-    serializer = ParticipantsSerializer(participant)
-    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-
-@api_view(['Put'])
-def restore_Participant_detail(request, key, format = None):
-    participant = get_object_or_404(Participant, pk=key)
-    participant.status = 'A'
+    participant.status = request.data['status']
     participant.save()
     serializer = ParticipantsSerializer(participant)
     return Response(serializer.data, status=status.HTTP_202_ACCEPTED)

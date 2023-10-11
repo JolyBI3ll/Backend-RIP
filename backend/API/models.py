@@ -37,7 +37,7 @@ class Request(models.Model):
 # W - created, send, closed
 
 class RequestParticipant(models.Model):
-    Participant_count = models.IntegerField(verbose_name="Количество участников в данном запросе", default = 0)
+    is_capitan = models.BooleanField(verbose_name="Капитан?", default=False)
     Participant = models.ForeignKey(Participant, on_delete = models.CASCADE, verbose_name="Участник")
     Request = models.ForeignKey(Request, on_delete = models.CASCADE, verbose_name="Заявка")
 
