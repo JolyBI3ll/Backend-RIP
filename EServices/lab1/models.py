@@ -25,6 +25,7 @@ class Request(models.Model):
     moder_id = models.ForeignKey(User, on_delete = models.CASCADE, verbose_name="ID_Модератор", related_name='moder_id')
 
 class RequestParticipant(models.Model):
+    is_captain = models.BooleanField(verbose_name="Капитан?", default=False)
     Participant = models.ForeignKey(Participant, on_delete = models.CASCADE, verbose_name="Участник")
     Request = models.ForeignKey(Request, on_delete = models.CASCADE, verbose_name="Заявка")
 
