@@ -24,14 +24,14 @@ router = routers.DefaultRouter()
 
 urlpatterns = [
     path('', include(router.urls)),
-    path(r'participants/', get_Participants, name='participants-get'),
-    path(r'participants/post/', post_Participants, name='participants-post'),
+    path('admin/', admin.site.urls),
+
+    path(r'participants/', process_Participantlist, name='participants-get'),
+   
     path(r'participants/<int:key>/', get_Participants_detail, name='participants-detail'),
     path(r'participants/<int:key>/put/', put_Participants_detail, name='participants-put'),
     path(r'participants/<int:key>/delete/', delete_Participant_detail, name='participant_delete-put'),
-    path('admin/', admin.site.urls),
-
-
+    
     path(r'application/', get_RequestList, name='request-list'),
     path(r'application/<int:key>/', get_Request_detail, name='request-detail'),
     path(r'application/<int:key>/put/', put_Request, name='request-put'),
