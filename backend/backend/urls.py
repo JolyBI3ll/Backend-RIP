@@ -27,10 +27,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path(r'participants/', process_Participantlist, name='participants-get'),
-   
-    path(r'participants/<int:key>/', get_Participants_detail, name='participants-detail'),
-    path(r'participants/<int:key>/put/', put_Participants_detail, name='participants-put'),
-    path(r'participants/<int:key>/delete/', delete_Participant_detail, name='participant_delete-put'),
+    path(r'participants/<int:key>/', procces_Participant_detail, name='participants-detail'),
     
     path(r'application/', get_RequestList, name='request-list'),
     path(r'application/<int:key>/', get_Request_detail, name='request-detail'),
