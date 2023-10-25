@@ -19,7 +19,7 @@ from django.urls import path, include
 from rest_framework import routers
 from api.views.ParticipantsViews import *
 from api.views.RequestViews import *
-
+from api.views.RequestParticipantViews import *
 router = routers.DefaultRouter()
 
 urlpatterns = [
@@ -28,6 +28,8 @@ urlpatterns = [
 
     path(r'participants/', process_Participantlist, name='participants-get'),
     path(r'participants/<int:key>/', procces_Participant_detail, name='participants-detail'),
+
+    path(r'mm/', process_MM, name = 'links'),
     
     path(r'application/', get_RequestList, name='request-list'),
     path(r'application/<int:key>/', get_Request_detail, name='request-detail'),

@@ -38,8 +38,9 @@ class Request(models.Model):
 
 class RequestParticipant(models.Model):
     is_capitan = models.BooleanField(verbose_name="Капитан?", default=False)
-    Participant = models.ForeignKey(Participant, on_delete = models.CASCADE, verbose_name="Участник")
     Request = models.ForeignKey(Request, on_delete = models.CASCADE, verbose_name="Заявка")
+    Participant = models.ForeignKey(Participant, on_delete = models.CASCADE, verbose_name="Участник")
+
 
     class Meta:
         unique_together = (('Participant', 'Request'),)
