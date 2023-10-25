@@ -19,7 +19,7 @@ def get_Request_detail(request, key, format=None):
     userId = getUserId()
     application = get_object_or_404(Request, pk=key)
     applicationserializer = RequestSerializer(application)
-    positions = RequestParticipant.objects.filter(Request=User.objects.get(pk=userId).active_order)
+    positions = RequestParticipant.objects.filter(Request=User.objects.get(pk=userId).active_request)
     positionsSerializer = PositionSerializer(positions, many=True)
     response = applicationserializer.data
     response['positions'] = positionsSerializer.data
@@ -39,10 +39,10 @@ def checkStatusUpdate(old, new, isModer):
 
 def changeStatusByYser(user, status_):
     currentUser = User.objects.get(pk=user)
-    application = get_object_or_404(Request, pk=currentUser.active_order)
+    application = get_object_or_404(Request, pk=currentUser.active_request)
     new_status = status_
     if checkStatusUpdate(application.status, new_status, isModer=False):
-        currentUser.active_order = -1
+        currentUser.active_request = -1
         currentUser.save()
         application.status = new_status
         application.send = datetime.now()
