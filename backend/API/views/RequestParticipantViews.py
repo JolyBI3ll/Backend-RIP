@@ -4,7 +4,7 @@ from rest_framework import status
 from ..serializers import *
 from ..models import *
 from rest_framework.decorators import api_view
-from getUserId import getUserId
+from .getUserId import getUserId
 
 @api_view(['Delete', 'Put'])
 def process_MM(request, format = None):

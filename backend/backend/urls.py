@@ -26,14 +26,13 @@ urlpatterns = [
     path('', include(router.urls)),
     path('admin/', admin.site.urls),
 
-    path(r'participants/', process_Participantlist, name='participants-get'),
-    path(r'participants/<int:key>/', procces_Participant_detail, name='participants-detail'),
+    path(r'participants/', process_Participantlist, name='participants-process'),
+    path(r'participants/<int:pk>/', procces_Participant_detail, name='participants-detail-process'),
 
     path(r'mm/', process_MM, name = 'links'),
     
-    path(r'application/', get_RequestList, name='request-list'),
-    path(r'application/<int:key>/', get_Request_detail, name='request-detail'),
-    path(r'application/<int:key>/put/', put_Request, name='request-put'),
+    path(r'application/', process_RequestList, name='request-list-process'),
+    path(r'application/<int:pk>/', process_Request_detail, name='request-detail-process'),
 
     path(r'application/user/<int:user>/send/', sendRequest, name='send-request'),
     path(r'application/user/<int:user>/delete/', deleteRequest, name='request-delete'),

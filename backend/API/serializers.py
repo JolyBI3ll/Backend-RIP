@@ -25,4 +25,4 @@ class RequestParticipantSerializer(serializers.ModelSerializer):
 class PositionSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestParticipant
-        fields = ["Participant_count","Participant"]
+        fields = ["is_capitan","Participant"]

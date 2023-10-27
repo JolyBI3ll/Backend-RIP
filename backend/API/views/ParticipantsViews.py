@@ -40,9 +40,9 @@ def process_Participantlist(request, format=None):
 
 
 @api_view(['Get', 'Post', 'Put', 'Delete'])
-def procces_Participant_detail(request, key, format=None):
+def procces_Participant_detail(request, pk, format=None):
     if request.method == 'GET':
-        participant = get_object_or_404(Participant,pk=key)
+        participant = get_object_or_404(Participant,pk=pk)
         serializer = ParticipantsSerializer(participant)
         return Response(getProductDataWithImage(serializer), status=status.HTTP_202_ACCEPTED)
     
@@ -63,10 +63,10 @@ def procces_Participant_detail(request, key, format=None):
             else:
                 return Response(RequestSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
-        if Request.objects.get(pk=RequestId).status != 'I' or len(RequestParticipant.objects.filter(pk=key).filter(Request=RequestId)) != 0:
+        if Request.objects.get(pk=RequestId).status != 'I' or len(RequestParticipant.objects.filter(pk=pk).filter(Request=RequestId)) != 0:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         link = {}
-        link['Participant'] = key
+        link['Participant'] = pk
         link['Request'] = RequestId
         serializer = RequestParticipant(data=link)
         if serializer.is_valid():
@@ -80,14 +80,14 @@ def procces_Participant_detail(request, key, format=None):
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        participant = get_object_or_404(Participant, pk=key)
+        participant = get_object_or_404(Participant, pk=pk)
         participant.status = new_status
         participant.save()
         serializer = ParticipantsSerializer(participant)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
     
     elif request.method == 'PUT':
-        product = get_object_or_404(Participant, pk=key)
+        product = get_object_or_404(Participant, pk=pk)
         fields = request.data.keys()
         if 'pk' in fields or 'status' in fields or 'last_modified' in fields:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -7,33 +7,6 @@ from rest_framework.decorators import api_view
 from datetime import datetime
 from .getUserId import *
 
-
-@api_view(['Get'])
-def get_RequestList(request, format=None):
-    application = Request.objects.all()
-    serializer = RequestSerializer(application, many=True)
-    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-
-@api_view(['Get'])
-def get_Request_detail(request, key, format=None):
-    userId = getUserId()
-    application = get_object_or_404(Request, pk=key)
-    applicationserializer = RequestSerializer(application)
-    positions = RequestParticipant.objects.filter(Request=User.objects.get(pk=userId).active_request)
-    positionsSerializer = PositionSerializer(positions, many=True)
-    response = applicationserializer.data
-    response['positions'] = positionsSerializer.data
-    return Response(response, status=status.HTTP_202_ACCEPTED)
-
-@api_view(['Put'])
-def put_Request(request, key, format=None):
-    application = get_object_or_404(Request, pk=key)
-    serializer = RequestSerializer(application, data=request.data)
-    if serializer.is_valid() and ((not request.data.get('status')) or application.status == request.data['status']):
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 def checkStatusUpdate(old, new, isModer):
     return ((not isModer) and (new in ['P', 'D']) and (old == 'I')) or (isModer and (new in ['A', 'W']) and (old == 'P'))
 
@@ -50,6 +23,37 @@ def changeStatusByYser(user, status_):
         serializer = RequestSerializer(application)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['Get'])
+def process_RequestList(request, format=None):
+
+    application = Request.objects.all()
+    serializer = RequestSerializer(application, many=True)
+    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+@api_view(['Get','Put'])
+def process_Request_detail(request, pk, format=None):
+
+    if request.method == 'GET':
+        userId = getUserId()
+        application = get_object_or_404(Request, pk=pk)
+        applicationserializer = RequestSerializer(application)
+        positions = RequestParticipant.objects.filter(Request=User.objects.get(pk=userId).active_request)
+        positionsSerializer = PositionSerializer(positions, many=True)
+        response = applicationserializer.data
+        response['positions'] = positionsSerializer.data
+        return Response(response, status=status.HTTP_202_ACCEPTED)
+    
+    elif request.method == 'POST':
+        application = get_object_or_404(Request, pk=pk)
+        serializer = RequestSerializer(application, data=request.data)
+        if serializer.is_valid() and ((not request.data.get('status')) or application.status == request.data['status']):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+##----------------------------------------------------------------------------------------------------------------------
 
 @api_view(['Put'])
 def sendRequest(request, user, format=None):
