@@ -6,74 +6,124 @@ from ..models import *
 from rest_framework.decorators import api_view
 from datetime import datetime
 from .getUserId import *
+from ..minio.MinioClass import MinioClass
 
 def checkStatusUpdate(old, new, isModer):
     return ((not isModer) and (new in ['P', 'D']) and (old == 'I')) or (isModer and (new in ['A', 'W']) and (old == 'P'))
 
-def changeStatusByYser(user, status_):
-    currentUser = User.objects.get(pk=user)
-    application = get_object_or_404(Request, pk=currentUser.active_request)
-    new_status = status_
-    if checkStatusUpdate(application.status, new_status, isModer=False):
-        currentUser.active_request = -1
-        currentUser.save()
-        application.status = new_status
-        application.send = datetime.now()
-        application.save()
-        serializer = RequestSerializer(application)
-        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+def getParticipantInRequsetWithImage(serializer: ParticipantsSerializer):
+    minio = MinioClass()
+    ParticipantData = serializer.data
+    ParticipantData['image'] = minio.getImage('images', serializer.data['id'], serializer.data['file_extension'])
+    return ParticipantData
 
+# добавляет данные продукта ко всем позициям заказа
+def getRequestPositionsWithParticipantData(serializer: PositionSerializer):
+    positions = []
+    for item in serializer.data:
+        participant = get_object_or_404(Participant, pk=item['Participant'])
+        positionData = item
+        positionData['participant_data'] = getParticipantInRequsetWithImage(Participant(participant))
+        positions.append(positionData)
+    return positions
 
-@api_view(['Get'])
+@api_view(['Get', 'Put', 'Delete'])
 def process_RequestList(request, format=None):
 
-    application = Request.objects.all()
-    serializer = RequestSerializer(application, many=True)
-    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+    # получение списка заказов
+    if request.method == 'GET':
+        application = Request.objects.all()
+        serializer = RequestSerializer(application, many=True)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+    
+    # отправка заказа пользователем
+    elif request.method == 'PUT':
+        userId = getUserId()
+        currentUser = User.objects.get(pk=userId)
+        application = get_object_or_404(Request, pk=currentUser.active_request)
+        new_status = "P"
+        if checkStatusUpdate(application.status, new_status, isModer=False):
+            currentUser.active_request = -1
+            currentUser.save()
+            application.status = new_status
+            application.send = datetime.now()
+            application.save()
+            serializer = RequestSerializer(application)
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    
+    # удаление заказа пользователем
+    elif request.method == 'DELETE':
+        userId = getUserId()
+        currentUser = User.objects.get(pk=userId)
+        new_status = "D"
+        application = get_object_or_404(Request, pk=currentUser.active_request)
+        if checkStatusUpdate(application.status, new_status, isModer=False):
+            currentUser.active_request = -1
+            currentUser.save()
+            application.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['Get','Put'])
+# @api_view(['Get','Put'])
+# def process_Request_detail(request, pk, format=None):
+
+#     if request.method == 'GET':
+#         userId = getUserId()
+#         application = get_object_or_404(Request, pk=pk)
+#         applicationserializer = RequestSerializer(application)
+#         positions = RequestParticipant.objects.filter(Request=User.objects.get(pk=userId).active_request)
+#         positionsSerializer = PositionSerializer(positions, many=True)
+#         response = applicationserializer.data
+#         response['positions'] = positionsSerializer.data
+#         return Response(response, status=status.HTTP_202_ACCEPTED)
+    
+#     elif request.method == 'POST':
+#         application = get_object_or_404(Request, pk=pk)
+#         serializer = RequestSerializer(application, data=request.data)
+#         if serializer.is_valid() and ((not request.data.get('status')) or application.status == request.data['status']):
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['Get', 'Put', 'Delete'])
 def process_Request_detail(request, pk, format=None):
 
+    # получение заказа
     if request.method == 'GET':
-        userId = getUserId()
         application = get_object_or_404(Request, pk=pk)
-        applicationserializer = RequestSerializer(application)
-        positions = RequestParticipant.objects.filter(Request=User.objects.get(pk=userId).active_request)
+        applicationSerializer = RequestSerializer(application)
+
+        positions = RequestParticipant.objects.filter(Request=pk)
         positionsSerializer = PositionSerializer(positions, many=True)
-        response = applicationserializer.data
-        response['positions'] = positionsSerializer.data
+
+        response = applicationSerializer.data
+        response['positions'] = getRequestPositionsWithParticipantData(positionsSerializer)
+
         return Response(response, status=status.HTTP_202_ACCEPTED)
     
-    elif request.method == 'POST':
-        application = get_object_or_404(Request, pk=pk)
-        serializer = RequestSerializer(application, data=request.data)
-        if serializer.is_valid() and ((not request.data.get('status')) or application.status == request.data['status']):
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-##----------------------------------------------------------------------------------------------------------------------
-
-@api_view(['Put'])
-def sendRequest(request, user, format=None):
-    return changeStatusByYser(user, "P")
-
-@api_view(['Put'])
-def deleteRequest(request, user, format=None):    
-    return changeStatusByYser(user, "D")
-
-@api_view(['Put'])
-def closeRequest(request, key, format=None):
-    application = get_object_or_404(Request, pk=key)
-    try: 
-        new_status = request.data['status']
-    except:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-    if checkStatusUpdate(application.status, new_status, isModer=True):
-        application.status = new_status
-        application.closed = datetime.now()
-        application.save()
-        serializer = RequestSerializer(application)
-        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+    # изменение заказа
+    # elif request.method == 'PUT':
+    #     order = get_object_or_404(OpticOrder, pk=pk)
+    #     serializer = OpticOrderSerializer(order, data=request.data)
+    #     if 'status' in request.data.keys():
+    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    # # перевод заказа модератором на статус A или W
+    # elif request.method == 'DELETE':
+    #     order = get_object_or_404(OpticOrder, pk=pk)
+    #     try: 
+    #         new_status = request.data['status']
+    #     except:
+    #         return Response(status=status.HTTP_400_BAD_REQUEST)
+    #     if checkStatusUpdate(order.status, new_status, isModer=True):
+    #         order.status = new_status
+    #         order.closed = datetime.now()
+    #         order.save()
+    #         serializer = OpticOrderSerializer(order)
+    #         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+    #     return Response(status=status.HTTP_400_BAD_REQUEST)

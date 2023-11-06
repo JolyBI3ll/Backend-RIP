@@ -33,8 +33,4 @@ urlpatterns = [
     
     path(r'application/', process_RequestList, name='request-list-process'),
     path(r'application/<int:pk>/', process_Request_detail, name='request-detail-process'),
-
-    path(r'application/user/<int:user>/send/', sendRequest, name='send-request'),
-    path(r'application/user/<int:user>/delete/', deleteRequest, name='request-delete'),
-    path(r'application/<int:key>/close/', closeRequest, name='close-request'),
 ]

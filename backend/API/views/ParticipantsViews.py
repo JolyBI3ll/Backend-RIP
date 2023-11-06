@@ -16,17 +16,17 @@ def getProductDataWithImage(serializer: ParticipantsSerializer):
 
 def postProductImage(request, serializer: ParticipantsSerializer):
     minio = MinioClass()
-    minio.addImage('images', serializer.data['pk'], request.data['image'], serializer.data['file_extension'])
+    minio.addImage('images', serializer.data['id'], request.data['image'], serializer.data['file_extension'])
 
 def putProductImage(request, serializer: ParticipantsSerializer):
     minio = MinioClass()
-    minio.removeImage('images', serializer.data['pk'], serializer.data['file_extension'])
-    minio.addImage('images', serializer.data['pk'], request.data['image'], serializer.data['file_extension'])
+    minio.removeImage('images', serializer.data['id'], serializer.data['file_extension'])
+    minio.addImage('images', serializer.data['id'], request.data['image'], serializer.data['file_extension'])
 
 @api_view(['Get', 'Post'])
 def process_Participantlist(request, format=None):
     if request.method == 'GET':
-        Participants = Participant.objects.all().Request_by('last_modified')
+        Participants = Participant.objects.all().order_by('id')
         ParticipantsData = [getProductDataWithImage(ParticipantsSerializer(participant)) for participant in Participants]
         return Response(ParticipantsData, status=status.HTTP_202_ACCEPTED)
     
@@ -46,14 +46,14 @@ def procces_Participant_detail(request, pk, format=None):
         serializer = ParticipantsSerializer(participant)
         return Response(getProductDataWithImage(serializer), status=status.HTTP_202_ACCEPTED)
     
-    elif request.method == 'POST': 
+    elif request.method == 'POST':
         userId = getUserId()
         currentUser = User.objects.get(pk=userId)
         RequestId = currentUser.active_request
         if RequestId == -1:   
             Request_new = {}      
-            Request_new['user'] = userId
-            Request_new['moderator'] = random.choice(User.objects.filter(is_moderator=True)).pk
+            Request_new['user_id'] = userId
+            Request_new['moder_id'] = random.choice(User.objects.filter(is_moderator=True)).pk
             requestserializer = RequestSerializer(data=Request)
             if requestserializer.is_valid():
                 requestserializer.save()  
