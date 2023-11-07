@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from .getUserId import *
-from random import random
+import random
 from ..serializers import *
 from ..models import *
 from rest_framework.decorators import api_view
@@ -63,12 +63,13 @@ def procces_Participant_detail(request, pk, format=None):
             else:
                 return Response(RequestSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
-        if Request.objects.get(pk=RequestId).status != 'I' or len(RequestParticipant.objects.filter(pk=pk).filter(Request=RequestId)) != 0:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # if Request.objects.get(pk=RequestId).status != 'I' or len(RequestParticipant.objects.filter(pk=pk).filter(Request=RequestId)) != 0:
+        #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         link = {}
         link['Participant'] = pk
         link['Request'] = RequestId
-        serializer = RequestParticipant(data=link)
+        link['is_capitan'] = False
+        serializer = RequestParticipantSerializer(data=link)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
