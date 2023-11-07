@@ -23,7 +23,7 @@ def getRequestPositionsWithParticipantData(serializer: PositionSerializer):
     for item in serializer.data:
         participant = get_object_or_404(Participant, pk=item['Participant'])
         positionData = item
-        positionData['participant_data'] = getParticipantInRequsetWithImage(Participant(participant))
+        positionData['participant_data'] = getParticipantInRequsetWithImage(ParticipantsSerializer(participant))
         positions.append(positionData)
     return positions
 
@@ -102,28 +102,27 @@ def process_Request_detail(request, pk, format=None):
 
         return Response(response, status=status.HTTP_202_ACCEPTED)
     
-    # изменение заказа
-    # elif request.method == 'PUT':
-    #     order = get_object_or_404(OpticOrder, pk=pk)
-    #     serializer = OpticOrderSerializer(order, data=request.data)
-    #     if 'status' in request.data.keys():
-    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == 'PUT':
+        application = get_object_or_404(Request, pk=pk)
+        serializer = RequestSerializer(application, data=request.data)
+        if 'status' in request.data.keys():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    # # перевод заказа модератором на статус A или W
-    # elif request.method == 'DELETE':
-    #     order = get_object_or_404(OpticOrder, pk=pk)
-    #     try: 
-    #         new_status = request.data['status']
-    #     except:
-    #         return Response(status=status.HTTP_400_BAD_REQUEST)
-    #     if checkStatusUpdate(order.status, new_status, isModer=True):
-    #         order.status = new_status
-    #         order.closed = datetime.now()
-    #         order.save()
-    #         serializer = OpticOrderSerializer(order)
-    #         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-    #     return Response(status=status.HTTP_400_BAD_REQUEST)
+    # перевод заказа модератором на статус A или W
+    elif request.method == 'DELETE':
+        application = get_object_or_404(Request, pk=pk)
+        try: 
+            new_status = request.data['status']
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if checkStatusUpdate(application.status, new_status, isModer=True):
+            application.status = new_status
+            application.closed = datetime.now()
+            application.save()
+            serializer = RequestSerializer(application)
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)

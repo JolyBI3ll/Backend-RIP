@@ -4,7 +4,7 @@ from io import BytesIO
 from base64 import b64encode, b64decode
 import os
 
-from .minio_config import *
+from minio_config import *
 
 class MinioClass:
     def __init__(self):
@@ -49,7 +49,8 @@ class MinioClass:
 
     def getImage(self, username: str, image_id: int, image_extension: str):
         try:
-            result = self.client.get_object(bucket_name=username, object_name=f"{image_id}.{image_extension}")
+            result = self.client.get_object(bucket_name=username,
+                                            object_name=f"{image_id}.{image_extension}")
             return b64encode(BytesIO(result.data).read()).decode()
         except S3Error as e:
             print("minio error occurred: ", e)
