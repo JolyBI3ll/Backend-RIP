@@ -23,14 +23,15 @@ from api.views.RequestParticipantViews import *
 router = routers.DefaultRouter()
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('admin/', admin.site.urls),
+    path('', include(router.urls)),
 
-    path(r'participants/', process_Participantlist, name='participants-process'),
+    path(r'participants/', process_Participant_list, name='participants-process'),
     path(r'participants/<int:pk>/', procces_Participant_detail, name='participants-detail-process'),
 
-    path(r'mm/', process_MM, name = 'links'),
+    path(r'links/', process_MM, name = 'links'),
     
-    path(r'application/', process_RequestList, name='request-list-process'),
-    path(r'application/<int:pk>/', process_Request_detail, name='request-detail-process'),
+    path(r'request/', process_Request_List, name='request-list-process'),
+    path(r'request/<int:pk>/', process_Request_detail, name='request-detail-process'),
 ]

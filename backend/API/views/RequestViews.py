@@ -28,7 +28,7 @@ def getRequestPositionsWithParticipantData(serializer: PositionSerializer):
     return positions
 
 @api_view(['Get', 'Put', 'Delete'])
-def process_RequestList(request, format=None):
+def process_Request_List(request, format=None):
 
     # получение списка заказов
     if request.method == 'GET':

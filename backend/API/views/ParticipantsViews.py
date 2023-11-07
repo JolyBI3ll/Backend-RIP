@@ -24,7 +24,7 @@ def putProductImage(request, serializer: ParticipantsSerializer):
     minio.addImage('images', serializer.data['id'], request.data['image'], serializer.data['file_extension'])
 
 @api_view(['Get', 'Post'])
-def process_Participantlist(request, format=None):
+def process_Participant_list(request, format=None):
     if request.method == 'GET':
         Participants = Participant.objects.all().order_by('id')
         ParticipantsData = [getProductDataWithImage(ParticipantsSerializer(participant)) for participant in Participants]
