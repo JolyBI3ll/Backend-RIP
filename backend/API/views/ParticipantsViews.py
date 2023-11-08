@@ -7,6 +7,7 @@ from ..serializers import *
 from ..models import *
 from rest_framework.decorators import api_view
 from ..minio.MinioClass import MinioClass
+from ..filters import *
 
 def getParticipantDataWithImage(serializer: ParticipantsSerializer):
     minio = MinioClass()
@@ -26,7 +27,7 @@ def putParticipantImage(request, serializer: ParticipantsSerializer):
 @api_view(['Get', 'Post'])
 def process_Participant_list(request, format=None):
     if request.method == 'GET':
-        Participants = Participant.objects.all().order_by('id')
+        Participants = filterParticipant(Participant.objects.all().order_by('last_modified'), request)
         ParticipantsData = [getParticipantDataWithImage(ParticipantsSerializer(participant)) for participant in Participants]
         return Response(ParticipantsData, status=status.HTTP_202_ACCEPTED)
     

@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view
 from datetime import datetime
 from .getUserId import *
 from ..minio.MinioClass import MinioClass
+from ..filters import *
 
 def checkStatusUpdate(old, new, isModer):
     return ((not isModer) and (new in ['P', 'D']) and (old == 'I')) or (isModer and (new in ['A', 'W']) and (old == 'P'))
@@ -32,7 +33,7 @@ def process_Request_List(request, format=None):
 
     # получение списка заказов
     if request.method == 'GET':
-        application = Request.objects.all()
+        application = filterRequest(Request.objects.all(), request)
         serializer = RequestSerializer(application, many=True)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
     
