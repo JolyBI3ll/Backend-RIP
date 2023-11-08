@@ -8,17 +8,17 @@ from ..models import *
 from rest_framework.decorators import api_view
 from ..minio.MinioClass import MinioClass
 
-def getProductDataWithImage(serializer: ParticipantsSerializer):
+def getParticipantDataWithImage(serializer: ParticipantsSerializer):
     minio = MinioClass()
     ParticipantData = serializer.data
     ParticipantData['image'] = minio.getImage('images', serializer.data['id'], serializer.data['file_extension'])
     return ParticipantData
 
-def postProductImage(request, serializer: ParticipantsSerializer):
+def postParticipantImage(request, serializer: ParticipantsSerializer):
     minio = MinioClass()
     minio.addImage('images', serializer.data['id'], request.data['image'], serializer.data['file_extension'])
 
-def putProductImage(request, serializer: ParticipantsSerializer):
+def putParticipantImage(request, serializer: ParticipantsSerializer):
     minio = MinioClass()
     minio.removeImage('images', serializer.data['id'], serializer.data['file_extension'])
     minio.addImage('images', serializer.data['id'], request.data['image'], serializer.data['file_extension'])
@@ -27,14 +27,14 @@ def putProductImage(request, serializer: ParticipantsSerializer):
 def process_Participant_list(request, format=None):
     if request.method == 'GET':
         Participants = Participant.objects.all().order_by('id')
-        ParticipantsData = [getProductDataWithImage(ParticipantsSerializer(participant)) for participant in Participants]
+        ParticipantsData = [getParticipantDataWithImage(ParticipantsSerializer(participant)) for participant in Participants]
         return Response(ParticipantsData, status=status.HTTP_202_ACCEPTED)
     
     elif request.method == 'POST':
         serializer = ParticipantsSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            postProductImage(request, serializer)
+            postParticipantImage(request, serializer)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -44,7 +44,7 @@ def procces_Participant_detail(request, pk, format=None):
     if request.method == 'GET':
         participant = get_object_or_404(Participant,pk=pk)
         serializer = ParticipantsSerializer(participant)
-        return Response(getProductDataWithImage(serializer), status=status.HTTP_202_ACCEPTED)
+        return Response(getParticipantDataWithImage(serializer), status=status.HTTP_202_ACCEPTED)
     
     elif request.method == 'POST':
         userId = getUserId()
@@ -96,6 +96,6 @@ def procces_Participant_detail(request, pk, format=None):
         if serializer.is_valid():
             serializer.save()
             if 'image' in fields:
-                putProductImage(request, serializer)
+                putParticipantImage(request, serializer)
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
