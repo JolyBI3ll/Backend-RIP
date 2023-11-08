@@ -14,7 +14,7 @@ class User(models.Model):
     name = models.CharField(max_length=20, verbose_name="Имя")
     login = models.CharField(max_length=20, verbose_name="Логин")
     password = models.CharField(max_length=50, verbose_name="Пароль")
-    is_manager = models.BooleanField(verbose_name="Модератор?")
+    is_moderator = models.BooleanField(verbose_name="Модератор?")
     active_request = models.IntegerField(verbose_name="Активная заявка", default=-1)
 
 class Request(models.Model):

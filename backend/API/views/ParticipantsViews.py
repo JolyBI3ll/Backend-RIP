@@ -54,10 +54,10 @@ def procces_Participant_detail(request, pk, format=None):
             Request_new = {}      
             Request_new['user_id'] = userId
             Request_new['moder_id'] = random.choice(User.objects.filter(is_moderator=True)).pk
-            requestserializer = RequestSerializer(data=Request)
+            requestserializer = RequestSerializer(data=Request_new)
             if requestserializer.is_valid():
                 requestserializer.save()  
-                RequestId = requestserializer.data['pk']
+                RequestId = requestserializer.data['id']
                 currentUser.active_request = RequestId
                 currentUser.save()
             else:
@@ -90,7 +90,7 @@ def procces_Participant_detail(request, pk, format=None):
     elif request.method == 'PUT':
         product = get_object_or_404(Participant, pk=pk)
         fields = request.data.keys()
-        if 'pk' in fields or 'status' in fields or 'last_modified' in fields:
+        if 'id' in fields or 'status' in fields or 'last_modified' in fields:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         serializer = ParticipantsSerializer(product, data=request.data)
         if serializer.is_valid():
