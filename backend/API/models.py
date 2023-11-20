@@ -15,13 +15,12 @@ class User(models.Model):
     login = models.CharField(max_length=20, verbose_name="Логин")
     password = models.CharField(max_length=50, verbose_name="Пароль")
     is_moderator = models.BooleanField(verbose_name="Модератор?")
-    active_request = models.IntegerField(verbose_name="Активная заявка", default=-1)
 
 class Request(models.Model):
     created = models.DateTimeField(auto_now=True, verbose_name="Создание")
     send = models.DateTimeField(verbose_name="Отправка", null=True, blank=True)
     closed = models.DateTimeField(verbose_name="Закрытие", null=True, blank=True)
-    status = models.CharField(max_length=20, verbose_name="Статус", default = "I") # I - inputing, P - processing, D - deleted by user, A - success, W - fail
+    status = models.CharField(max_length=1, verbose_name="Статус", default = "I") # I - inputing, P - processing, D - deleted by user, A - success, W - fail
     user_id = models.ForeignKey(User, on_delete = models.CASCADE, verbose_name="ID_Пользователь", related_name='user_id')
     moder_id = models.ForeignKey(User, on_delete = models.CASCADE, verbose_name="ID_Модератор", related_name='moder_id')
 

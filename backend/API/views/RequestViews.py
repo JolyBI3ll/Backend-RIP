@@ -9,6 +9,13 @@ from .getUserId import *
 from ..minio.MinioClass import MinioClass
 from ..filters import *
 
+def getInputtingId():
+    requestlist = Request.objects.filter(user_id = getUserId()).filter(status = 'I')
+    if not requestlist.exists():
+        return -1
+    else:
+        return requestlist[0].pk
+
 def checkStatusUpdate(old, new, isModer):
     return ((not isModer) and (new in ['P', 'D']) and (old == 'I')) or (isModer and (new in ['A', 'W']) and (old == 'P'))
 
@@ -35,17 +42,19 @@ def process_Request_List(request, format=None):
     if request.method == 'GET':
         application = filterRequest(Request.objects.all(), request)
         serializer = RequestSerializer(application, many=True)
-        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        wideApplication = serializer.data
+        for i, wa in enumerate(serializer.data):
+            user = get_object_or_404(User, pk=wa['user_id'])
+            moder = get_object_or_404(User, pk=wa['moder_id'])
+            wideApplication[i]['user_name'] = user.name
+            wideApplication[i]['moder_name'] = moder.name
+        return Response(wideApplication, status=status.HTTP_202_ACCEPTED)
     
     # отправка заказа пользователем
     elif request.method == 'PUT':
-        userId = getUserId()
-        currentUser = User.objects.get(pk=userId)
-        application = get_object_or_404(Request, pk=currentUser.active_request)
+        application = get_object_or_404(Request, pk=getInputtingId())
         new_status = "P"
         if checkStatusUpdate(application.status, new_status, isModer=False):
-            currentUser.active_request = -1
-            currentUser.save()
             application.status = new_status
             application.send = datetime.now()
             application.save()
@@ -55,37 +64,13 @@ def process_Request_List(request, format=None):
     
     # удаление заказа пользователем
     elif request.method == 'DELETE':
-        userId = getUserId()
-        currentUser = User.objects.get(pk=userId)
         new_status = "D"
-        application = get_object_or_404(Request, pk=currentUser.active_request)
+        application = get_object_or_404(Request, pk=getInputtingId())
         if checkStatusUpdate(application.status, new_status, isModer=False):
-            currentUser.active_request = -1
-            currentUser.save()
             application.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-# @api_view(['Get','Put'])
-# def process_Request_detail(request, pk, format=None):
-
-#     if request.method == 'GET':
-#         userId = getUserId()
-#         application = get_object_or_404(Request, pk=pk)
-#         applicationserializer = RequestSerializer(application)
-#         positions = RequestParticipant.objects.filter(Request=User.objects.get(pk=userId).active_request)
-#         positionsSerializer = PositionSerializer(positions, many=True)
-#         response = applicationserializer.data
-#         response['positions'] = positionsSerializer.data
-#         return Response(response, status=status.HTTP_202_ACCEPTED)
-    
-#     elif request.method == 'POST':
-#         application = get_object_or_404(Request, pk=pk)
-#         serializer = RequestSerializer(application, data=request.data)
-#         if serializer.is_valid() and ((not request.data.get('status')) or application.status == request.data['status']):
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['Get', 'Put', 'Delete'])
 def process_Request_detail(request, pk, format=None):

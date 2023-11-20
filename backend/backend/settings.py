@@ -87,6 +87,11 @@ DATABASES = {
     }
 }
 
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+AWS_STORAGE_BUCKET_NAME = 'images'
+AWS_ACCESS_KEY_ID = 'HAl5y9Dc5u7iM2JgbfIR'
+AWS_SECRET_ACCESS_KEY = 'R0NFDUtXYg1llgbpMLBoywySkxEQw8EAR2C7rLSF'
+AWS_S3_ENDPOINT_URL = 'http://127.0.0.1:9000'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

@@ -8,17 +8,25 @@ from ..models import *
 from rest_framework.decorators import api_view
 from ..minio.MinioClass import MinioClass
 from ..filters import *
+   
+def getInputtingId():
+    requestlist = Request.objects.filter(user_id = getUserId()).filter(status = 'I')
+    if not requestlist.exists():
+        return -1
+    else:
+        return requestlist[0].pk
 
 def getParticipantDataWithImage(serializer: ParticipantsSerializer):
     minio = MinioClass()
     ParticipantData = serializer.data
-    ParticipantData['image'] = minio.getImage('images', serializer.data['id'], serializer.data['file_extension'])
+    ParticipantData.update({'image': minio.getImage('images', serializer.data['id'], serializer.data['file_extension'])})
     return ParticipantData
 
 def postParticipantImage(request, serializer: ParticipantsSerializer):
     minio = MinioClass()
     minio.addImage('images', serializer.data['id'], request.data['image'], serializer.data['file_extension'])
 
+# изменяет картинку продукта в minio на переданную в request
 def putParticipantImage(request, serializer: ParticipantsSerializer):
     minio = MinioClass()
     minio.removeImage('images', serializer.data['id'], serializer.data['file_extension'])
@@ -49,8 +57,7 @@ def procces_Participant_detail(request, pk, format=None):
     
     elif request.method == 'POST':
         userId = getUserId()
-        currentUser = User.objects.get(pk=userId)
-        RequestId = currentUser.active_request
+        RequestId = getInputtingId()
         if RequestId == -1:   
             Request_new = {}      
             Request_new['user_id'] = userId
@@ -59,8 +66,6 @@ def procces_Participant_detail(request, pk, format=None):
             if requestserializer.is_valid():
                 requestserializer.save()  
                 RequestId = requestserializer.data['id']
-                currentUser.active_request = RequestId
-                currentUser.save()
             else:
                 return Response(RequestSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
