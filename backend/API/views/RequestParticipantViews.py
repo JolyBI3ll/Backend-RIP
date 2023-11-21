@@ -28,7 +28,6 @@ def process_MM(request, format = None):
             links[0].save()
             return Response(PositionSerializer(links[0]).data, status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
-    
     # удаление продукта из заказа
     elif request.method == 'DELETE':
         try: 
