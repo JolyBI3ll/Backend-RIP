@@ -35,9 +35,14 @@ def putParticipantImage(request, serializer: ParticipantsSerializer):
 @api_view(['Get', 'Post'])
 def process_Participant_list(request, format=None):
     if request.method == 'GET':
-        Participants = filterParticipant(Participant.objects.all().order_by('last_modified'), request)
+        requestid = getInputtingId()
+        List = {
+            'RequestId': requestid
+        }
+        Participants = filterParticipant(Participant.objects.filter(status = 'A').order_by('pk'), request)
         ParticipantsData = [getParticipantDataWithImage(ParticipantsSerializer(participant)) for participant in Participants]
-        return Response(ParticipantsData, status=status.HTTP_202_ACCEPTED)
+        List ['Participants'] = ParticipantsData
+        return Response(List, status=status.HTTP_202_ACCEPTED)
     
     elif request.method == 'POST':
         serializer = ParticipantsSerializer(data=request.data)

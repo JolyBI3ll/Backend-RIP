@@ -58,8 +58,10 @@ def process_Request_List(request, format=None):
             application.status = new_status
             application.send = datetime.now()
             application.save()
-            serializer = RequestSerializer(application)
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+            wideApplication = RequestSerializer(application).data
+            wideApplication['user_name'] = User.objects.get(pk = wideApplication['user_id']).name
+            wideApplication['moder_name'] = User.objects.get(pk = wideApplication['moder_id']).name
+            return Response(wideApplication, status=status.HTTP_202_ACCEPTED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
     
     # удаление заказа пользователем
@@ -72,34 +74,25 @@ def process_Request_List(request, format=None):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['Get', 'Put', 'Delete'])
+@api_view(['Get', 'Put'])
 def process_Request_detail(request, pk, format=None):
 
     # получение заказа
     if request.method == 'GET':
         application = get_object_or_404(Request, pk=pk)
         applicationSerializer = RequestSerializer(application)
-
+        wideApplication = applicationSerializer.data
+        
         positions = RequestParticipant.objects.filter(Request=pk)
         positionsSerializer = PositionSerializer(positions, many=True)
 
-        response = applicationSerializer.data
-        response['positions'] = getRequestPositionsWithParticipantData(positionsSerializer)
+        wideApplication['user_name'] = User.objects.get(pk = wideApplication['user_id']).name
+        wideApplication['moder_name'] = User.objects.get(pk = wideApplication['moder_id']).name
+        wideApplication['positions'] = getRequestPositionsWithParticipantData(positionsSerializer)
 
-        return Response(response, status=status.HTTP_202_ACCEPTED)
+        return Response(wideApplication, status=status.HTTP_202_ACCEPTED)
     
     elif request.method == 'PUT':
-        application = get_object_or_404(Request, pk=pk)
-        serializer = RequestSerializer(application, data=request.data)
-        if 'status' in request.data.keys():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    # перевод заказа модератором на статус A или W
-    elif request.method == 'DELETE':
         application = get_object_or_404(Request, pk=pk)
         try: 
             new_status = request.data['status']
@@ -109,6 +102,8 @@ def process_Request_detail(request, pk, format=None):
             application.status = new_status
             application.closed = datetime.now()
             application.save()
-            serializer = RequestSerializer(application)
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+            wideApplication = RequestSerializer(application).data
+            wideApplication['user_name'] = User.objects.get(pk = wideApplication['user_id']).name
+            wideApplication['moder_name'] = User.objects.get(pk = wideApplication['moder_id']).name
+            return Response(wideApplication, status=status.HTTP_202_ACCEPTED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
