@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_rename_app',
-    'django.contrib.staticfiles',
     'drf_yasg',
 ]
 

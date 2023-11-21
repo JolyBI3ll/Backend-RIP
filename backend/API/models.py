@@ -1,5 +1,17 @@
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
 # Create your models here.
+
+class NewUserManager(UserManager):
+    def create_user(self, username, password=None, **extra_fields):
+        if not username:
+            raise ValueError('User must have a username')
+        
+        user: User = self.model(username=username, **extra_fields) 
+        user.set_password(password)
+        user.save(using=self.db)
+        return user
+
 class Participant(models.Model):
     full_name = models.CharField(max_length=50, verbose_name="ФИО")
     status = models.CharField(max_length=1, verbose_name="Статус активности",default="A") #A - active, N - inactive 
@@ -10,11 +22,16 @@ class Participant(models.Model):
     last_modified = models.DateTimeField(auto_now=True, verbose_name="Последнее изменение", null=True, blank=True)
     file_extension = models.CharField(max_length=10, verbose_name="Расширение файла изображения",default="jpg")
 
-class User(models.Model):
-    name = models.CharField(max_length=20, verbose_name="Имя")
-    login = models.CharField(max_length=20, verbose_name="Логин")
-    password = models.CharField(max_length=50, verbose_name="Пароль")
-    is_moderator = models.BooleanField(verbose_name="Модератор?")
+class User(AbstractBaseUser, PermissionsMixin):
+    objects = NewUserManager()
+    
+    username = models.CharField(max_length=32, unique=True, verbose_name="Имя пользователя")
+    password = models.CharField(max_length=256, verbose_name="Пароль")
+    is_moderator = models.BooleanField(verbose_name="Модератор?", default=False)
+    is_staff = models.BooleanField(verbose_name="Можно в админку?", default=False)
+    is_superuser = models.BooleanField(verbose_name="Суперсус?", default=False)
+
+    USERNAME_FIELD = 'username'
 
 class Request(models.Model):
     created = models.DateTimeField(auto_now=True, verbose_name="Создание")
