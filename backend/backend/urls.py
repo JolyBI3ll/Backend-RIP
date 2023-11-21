@@ -17,9 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from api.views.ParticipantsViews import *
-from api.views.RequestViews import *
-from api.views.RequestParticipantViews import *
+from API.views.ParticipantsViews import *
+from API.views.RequestViews import *
+from API.views.RequestParticipantViews import *
 router = routers.DefaultRouter()
 
 urlpatterns = [
