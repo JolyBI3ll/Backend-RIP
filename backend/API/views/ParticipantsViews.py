@@ -8,7 +8,8 @@ from ..models import *
 from rest_framework.decorators import api_view
 from ..minio.MinioClass import MinioClass
 from ..filters import *
-   
+from drf_yasg.utils import swagger_auto_schema
+
 def getInputtingId():
     requestlist = Request.objects.filter(user_id = getUserId()).filter(status = 'I')
     if not requestlist.exists():
@@ -26,11 +27,11 @@ def postParticipantImage(request, serializer: ParticipantsSerializer):
     minio = MinioClass()
     minio.addImage('images', serializer.data['id'], request.data['image'], serializer.data['file_extension'])
 
-# изменяет картинку продукта в minio на переданную в request
 def putParticipantImage(request, serializer: ParticipantsSerializer):
     minio = MinioClass()
     minio.removeImage('images', serializer.data['id'], serializer.data['file_extension'])
     minio.addImage('images', serializer.data['id'], request.data['image'], serializer.data['file_extension'])
+
 
 @api_view(['Get', 'Post'])
 def process_Participant_list(request, format=None):
