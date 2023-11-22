@@ -3,6 +3,11 @@ def filterStatus(queryset, request):
         return queryset.filter(status=request.query_params.get('status'))
     return queryset
 
+def filtertitle(queryset, request):
+    if request.query_params.get('title'):
+        return queryset.filter(full_name__startswith = request.query_params.get('title'))
+    return queryset
+
 def filterCreated(queryset, request):
     lowerdate = "2020-01-01"
     higherdate = "2500-01-01"
@@ -15,7 +20,7 @@ def filterCreated(queryset, request):
     return queryset.filter(created__range=[lowerdate, higherdate])
 
 def filterParticipant(queryset, request):
-    return filterStatus(queryset, request)
+    return filtertitle(filterStatus(queryset, request), request)
 
 def filterRequest(queryset, request):
     return filterCreated(filterStatus(queryset, request), request)

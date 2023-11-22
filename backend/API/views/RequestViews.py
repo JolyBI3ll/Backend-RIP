@@ -22,7 +22,7 @@ def checkStatusUpdate(old, new, isModer):
 def getParticipantInRequsetWithImage(serializer: ParticipantsSerializer):
     minio = MinioClass()
     ParticipantData = serializer.data
-    ParticipantData['image'] = minio.getImage('images', serializer.data['id'], serializer.data['file_extension'])
+    ParticipantData.update({'image': minio.getImage('images', serializer.data['id'], serializer.data['file_extension'])})
     return ParticipantData
 
 # добавляет данные продукта ко всем позициям заказа
