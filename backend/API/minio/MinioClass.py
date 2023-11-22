@@ -3,6 +3,7 @@ from minio.error import S3Error
 from io import BytesIO
 from base64 import b64encode, b64decode
 import os
+import pip._vendor.requests as requests
 
 from minio_config import *
 
@@ -36,12 +37,11 @@ class MinioClass:
 
     def addImage(self, username: str, image_id: int, image_base64: str, image_extension: str):
         try:
-            image_data = b64decode(image_base64)
-            image_stream = BytesIO(image_data)
+            image_stream = BytesIO(image_base64)
             self.client.put_object(bucket_name=username,
                                    object_name=f"{image_id}.{image_extension}",
                                    data=image_stream,
-                                   length=len(image_data))
+                                   length=len(image_base64))
         except S3Error as e:
             print("minio error occurred: ", e)
         except Exception as e:

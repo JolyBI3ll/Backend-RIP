@@ -8,7 +8,9 @@ from ..models import *
 from rest_framework.decorators import api_view
 from ..minio.MinioClass import MinioClass
 from ..filters import *
-   
+from django.core.files.uploadedfile import InMemoryUploadedFile
+import io
+
 def getInputtingId():
     requestlist = Request.objects.filter(user_id = getUserId()).filter(status = 'I')
     if not requestlist.exists():
@@ -24,7 +26,9 @@ def getParticipantDataWithImage(serializer: ParticipantsSerializer):
 
 def postParticipantImage(request, serializer: ParticipantsSerializer):
     minio = MinioClass()
-    minio.addImage('images', serializer.data['id'], request.data['image'], serializer.data['file_extension'])
+    image_file = request.FILES.get('image')
+    byte_image = image_file.read()
+    minio.addImage('images', serializer.data['id'], byte_image, serializer.data['file_extension'])
 
 # изменяет картинку продукта в minio на переданную в request
 def putParticipantImage(request, serializer: ParticipantsSerializer):
