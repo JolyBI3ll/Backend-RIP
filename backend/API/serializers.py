@@ -20,10 +20,15 @@ class UserSerializer(ModelSerializer):
     is_staff = serializers.BooleanField(default=False, required=False)
     is_moderator = serializers.BooleanField(default=False, required=False)
     is_superuser = serializers.BooleanField(default=False, required=False)
+    is_active = serializers.BooleanField(default=True, required=False)
 
     class Meta:
         model = User
         fields = '__all__'
+
+class UserLoginSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    password = serializers.CharField(required=True)
 
 class RequestSerializer(ModelSerializer):
     def get_fields(self):
