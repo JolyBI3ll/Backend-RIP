@@ -39,6 +39,8 @@ schema_view = get_schema_view(
    permission_classes=(permissions.AllowAny,),
 )
 
+router.register(r'users', UserViewSet, basename='user')
+
 urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('admin/', admin.site.urls),
@@ -46,6 +48,7 @@ urlpatterns = [
 
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 
+    
     path('accounts/login/', login_view, name='login'),
     path('accounts/logout/', logout_view, name='logout'),
     path('accounts/check/', check, name='check'),
@@ -53,10 +56,10 @@ urlpatterns = [
     path(r'participants/', Participantlist_view.as_view(), name='participants-process'),
     path(r'participants/<int:pk>/', ParticipantDetail_view.as_view(), name='participants-detail-process'),
 
-    path(r'links/', process_MM, name = 'links'),
+    path(r'links/', links_view.as_view(), name = 'links'),
     
-    path(r'request/', process_Request_List, name='request-list-process'),
-    path(r'request/<int:pk>/', process_Request_detail, name='request-detail-process'),
+    path(r'request/', requestList_view.as_view(), name='request-list-process'),
+    path(r'request/<int:pk>/', requestDetail_view.as_view(), name='request-detail-process'),
 
     
 ]

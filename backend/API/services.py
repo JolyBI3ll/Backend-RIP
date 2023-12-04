@@ -19,7 +19,7 @@ def getOrderID(request):
         return -1
 
     user = User.objects.get(username=session_storage.get(session_id).decode('utf-8'))
-    application = Request.objects.filter(user=user).filter(status='I')
+    application = Request.objects.filter(user_id=user).filter(status='I')
     if application.exists():
         return application.first().pk
     return -1

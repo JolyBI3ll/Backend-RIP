@@ -72,13 +72,12 @@ class ParticipantDetail_view(APIView):
         session_id = get_session(request)
         if session_id is None:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
-        username_test = session_storage.get(session_id).decode('utf-8')
-        userId = User.objects.get(username=username_test)
+        userId = User.objects.get(username=session_storage.get(session_id).decode('utf-8'))
 
         RequestId = getOrderID(request)
         if RequestId == -1:   
             Request_new = {}      
-            Request_new['user_id'] = userId
+            Request_new['user_id'] = userId.pk
             Request_new['moder_id'] = random.choice(User.objects.filter(is_moderator=True)).pk
             requestserializer = RequestSerializer(data=Request_new)
             if requestserializer.is_valid():

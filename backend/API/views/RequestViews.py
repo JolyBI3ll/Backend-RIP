@@ -1,20 +1,24 @@
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
 from rest_framework import status
-from ..serializers import *
-from ..models import *
-from rest_framework.decorators import api_view
-from datetime import datetime
-from .getUserId import *
-from ..minio.MinioClass import MinioClass
-from ..filters import *
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from django.shortcuts import get_object_or_404
+from drf_yasg.utils import swagger_auto_schema
 
-def getInputtingId():
-    requestlist = Request.objects.filter(user_id = getUserId()).filter(status = 'I')
-    if not requestlist.exists():
-        return -1
-    else:
-        return requestlist[0].pk
+import redis
+from backend.settings import REDIS_HOST, REDIS_PORT
+
+from ..models import *
+from ..serializers import *
+from ..filters import *
+from ..permissions import *
+from ..services import *
+from api.minio.MinioClass import MinioClass
+
+from datetime import datetime
+
+
+session_storage = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT)
 
 def checkStatusUpdate(old, new, isModer):
     return ((not isModer) and (new in ['P', 'D']) and (old == 'I')) or (isModer and (new in ['A', 'W']) and (old == 'P'))
@@ -35,75 +39,115 @@ def getRequestPositionsWithParticipantData(serializer: PositionSerializer):
         positions.append(positionData)
     return positions
 
-@api_view(['Get', 'Put', 'Delete'])
-def process_Request_List(request, format=None):
-
+class requestList_view(APIView):
     # получение списка заказов
-    if request.method == 'GET':
-        application = filterRequest(Request.objects.all(), request)
+    # можно только если авторизован
+    def get(self, request, format=None):
+        session_id = get_session(request)
+        if session_id is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        
+        currentUser = User.objects.get(username=session_storage.get(session_id).decode('utf-8'))
+        if currentUser.is_moderator:
+            application = filterRequest(Request.objects.all(), request)
+        else:
+            application = filterRequest(Request.objects.filter(user_id=currentUser.pk), request)
+
         serializer = RequestSerializer(application, many=True)
         wideApplication = serializer.data
         for i, wa in enumerate(serializer.data):
             user = get_object_or_404(User, pk=wa['user_id'])
             moder = get_object_or_404(User, pk=wa['moder_id'])
-            wideApplication[i]['user_name'] = user.name
-            wideApplication[i]['moder_name'] = moder.name
+            wideApplication[i]['user_name'] = user.username
+            wideApplication[i]['moder_name'] = moder.username
         return Response(wideApplication, status=status.HTTP_202_ACCEPTED)
     
     # отправка заказа пользователем
-    elif request.method == 'PUT':
-        application = get_object_or_404(Request, pk=getInputtingId())
+    # можно только если авторизован
+    @swagger_auto_schema(request_body=RequestSerializer)
+    def put(self, request, format=None):
+        session_id = get_session(request)
+        if session_id is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        
+        application = get_object_or_404(Request, pk=getOrderID(request))
         new_status = "P"
         if checkStatusUpdate(application.status, new_status, isModer=False):
             application.status = new_status
             application.send = datetime.now()
             application.save()
             wideApplication = RequestSerializer(application).data
-            wideApplication['user_name'] = User.objects.get(pk = wideApplication['user_id']).name
-            wideApplication['moder_name'] = User.objects.get(pk = wideApplication['moder_id']).name
+            wideApplication['user_name'] = User.objects.get(pk = wideApplication['user_id']).username
+            wideApplication['moder_name'] = User.objects.get(pk = wideApplication['moder_id']).username
             return Response(wideApplication, status=status.HTTP_202_ACCEPTED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
     
     # удаление заказа пользователем
-    elif request.method == 'DELETE':
+    # можно только если авторизован
+    def delete(self, request, format=None):
+        session_id = get_session(request)
+        if session_id is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        
         new_status = "D"
-        application = get_object_or_404(Request, pk=getInputtingId())
+        application = get_object_or_404(Request, pk=getOrderID(request))
         if checkStatusUpdate(application.status, new_status, isModer=False):
             application.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(['Get', 'Put'])
-def process_Request_detail(request, pk, format=None):
-
-    # получение заказа
-    if request.method == 'GET':
-        application = get_object_or_404(Request, pk=pk)
-        applicationSerializer = RequestSerializer(application)
-        wideApplication = applicationSerializer.data
-        
-        positions = RequestParticipant.objects.filter(Request=pk)
-        positionsSerializer = PositionSerializer(positions, many=True)
-
-        wideApplication['user_name'] = User.objects.get(pk = wideApplication['user_id']).name
-        wideApplication['moder_name'] = User.objects.get(pk = wideApplication['moder_id']).name
-        wideApplication['positions'] = getRequestPositionsWithParticipantData(positionsSerializer)
-
-        return Response(wideApplication, status=status.HTTP_202_ACCEPTED)
     
-    elif request.method == 'PUT':
+
+
+class requestDetail_view(APIView):
+    # получение заказа
+    # можно получить свой заказ если авторизован
+    # если авторизован и модератор, то можно получить любой заказ
+    def get(self, request, pk, format=None):
+        session_id = get_session(request)
+        if session_id is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+        currentUser = User.objects.get(username=session_storage.get(session_id).decode('utf-8'))
+        order_keys = Request.objects.filter(user_id=currentUser.pk).values_list('pk', flat=True)
+        if (pk in order_keys) or currentUser.is_moderator:
+            application = get_object_or_404(Request, pk=pk)
+            applicationSerializer = RequestSerializer(application)
+            wideApplication = applicationSerializer.data
+            
+            positions = RequestParticipant.objects.filter(Request=pk)
+            positionsSerializer = PositionSerializer(positions, many=True)
+
+            wideApplication['user_name'] = User.objects.get(pk = wideApplication['user_id']).username
+            wideApplication['moder_name'] = User.objects.get(pk = wideApplication['moder_id']).username
+            wideApplication['positions'] = getRequestPositionsWithParticipantData(positionsSerializer)
+
+            return Response(wideApplication, status=status.HTTP_202_ACCEPTED)
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    
+    # перевод заказа модератором на статус A или W
+    # можно только если авторизован и модератор
+    @swagger_auto_schema(request_body=RequestSerializer)
+    def put(self, request, pk, format=None):
+        session_id = get_session(request)
+        if session_id is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        
+        currentUser = User.objects.get(username=session_storage.get(session_id).decode('utf-8'))
+        if not currentUser.is_moderator:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
         application = get_object_or_404(Request, pk=pk)
         try: 
             new_status = request.data['status']
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+        
         if checkStatusUpdate(application.status, new_status, isModer=True):
             application.status = new_status
             application.closed = datetime.now()
             application.save()
             wideApplication = RequestSerializer(application).data
-            wideApplication['user_name'] = User.objects.get(pk = wideApplication['user_id']).name
-            wideApplication['moder_name'] = User.objects.get(pk = wideApplication['moder_id']).name
+            wideApplication['user_name'] = User.objects.get(pk = wideApplication['user_id']).username
+            wideApplication['moder_name'] = User.objects.get(pk = wideApplication['moder_id']).username
             return Response(wideApplication, status=status.HTTP_202_ACCEPTED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
