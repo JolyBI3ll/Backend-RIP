@@ -44,17 +44,20 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
 
-    path(r'participants/', process_Participant_list, name='participants-process'),
-    path(r'participants/<int:pk>/', procces_Participant_detail, name='participants-detail-process'),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+
+    path('accounts/login/', login_view, name='login'),
+    path('accounts/logout/', logout_view, name='logout'),
+    path('accounts/check/', check, name='check'),
+
+    path(r'participants/', Participantlist_view.as_view(), name='participants-process'),
+    path(r'participants/<int:pk>/', ParticipantDetail_view.as_view(), name='participants-detail-process'),
 
     path(r'links/', process_MM, name = 'links'),
     
     path(r'request/', process_Request_List, name='request-list-process'),
     path(r'request/<int:pk>/', process_Request_detail, name='request-detail-process'),
 
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-
-    path('login',  login_view, name='login'),
-    path('logout', logout_view, name='logout'),
+    
 ]
 
