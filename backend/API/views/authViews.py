@@ -53,7 +53,7 @@ class UserViewSet(ModelViewSet):
             return Response({'status': 'Success'}, status=200)
         return Response({'status': 'Error', 'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-
+@swagger_auto_schema(operation_description="Данный метод возвращает список всех пользователей. Доступ: только если авторизован", method='post')
 @api_view(['Post'])
 @permission_classes([IsAuthenticated])
 def check(request):
@@ -67,7 +67,7 @@ def check(request):
     return Response(status=status.HTTP_403_FORBIDDEN)
 
 
-@swagger_auto_schema(method='post', request_body=UserSerializer)
+@swagger_auto_schema(operation_description="Данный метод авторизует пользователя. Доступ: все", method='post', request_body=UserSerializer)
 @api_view(['Post'])
 @permission_classes([AllowAny])
 def login_view(request):
@@ -93,7 +93,7 @@ def login_view(request):
         return HttpResponse(status=status.HTTP_403_FORBIDDEN)
 
 
-@swagger_auto_schema(method='post')
+@swagger_auto_schema(operation_description="Данный метод реализует выход из системы пользователя. Доступ: все", method='post')
 @api_view(['Post'])
 @permission_classes([AllowAny])
 def logout_view(request):

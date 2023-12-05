@@ -18,7 +18,7 @@ session_storage = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT)
 class links_view(APIView):
     # Изменение статуса "Капитан?"
     # можно только если авторизован
-    @swagger_auto_schema(request_body=RequestParticipantSerializer)
+    @swagger_auto_schema(operation_description="Данный метод реализовывает изменение статуса 'Капитан?' участника в заказе. Доступ: только если авторизован.", request_body=RequestParticipantSerializer)
     def put(self, request, format=None):
         session_id = get_session(request)
         if session_id is None:
@@ -36,9 +36,9 @@ class links_view(APIView):
             return Response(PositionSerializer(links[0]).data, status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
     
-    # удаление продукта из заказа
+    # удаление участника из заказа
     # можно только если авторизован
-    @swagger_auto_schema(request_body=RequestParticipantSerializer)
+    @swagger_auto_schema(operation_description="Данный метод реализовывает удаление участника из заказа. Доступ: только если авторизован.", request_body=RequestParticipantSerializer)
     def delete(self, request, format=None):
         session_id = get_session(request)
         if session_id is None:

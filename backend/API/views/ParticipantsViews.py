@@ -42,6 +42,7 @@ def putParticipantImage(request, serializer: ParticipantsSerializer):
 
 
 class Participantlist_view(APIView):
+    @swagger_auto_schema(operation_description="Данный метод возвращает инденитификатор черновика и список всех участников, зарегестрированных на нашем сайте. Доступ: все")
     def get(self, request, format=None):
         requestid = getOrderID(request)
         List = {
@@ -52,8 +53,8 @@ class Participantlist_view(APIView):
         List ['Participants'] = ParticipantsData
         return Response(List, status=status.HTTP_202_ACCEPTED)
     
-    @method_permission_classes((IsModerator,))
-    @swagger_auto_schema(request_body=ParticipantsSerializer)
+    @swagger_auto_schema(operation_description="Данный метод добавляет нового участника. Доступ: все.", request_body=ParticipantsSerializer)
+    @method_permission_classes((IsModerator))
     def post(self, request, format=None):
         serializer = ParticipantsSerializer(data=request.data)
         if serializer.is_valid():
@@ -63,11 +64,13 @@ class Participantlist_view(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ParticipantDetail_view(APIView):
+    @swagger_auto_schema(operation_description="Данный метод возвращает данные о конкретном участнике по идентификатору. Доступ: все.")
     def get(self, request, pk, format=None):
         participant = get_object_or_404(Participant,pk=pk)
         serializer = ParticipantsSerializer(participant)
         return Response(getParticipantDataWithImage(serializer), status=status.HTTP_202_ACCEPTED)
     
+    @swagger_auto_schema(operation_description="Данный метод добавляет услугу в заявку. Если заявки не существует, то создает ее. Доступ: только если авторизован.")
     def post(self, request, pk, format=None):
         session_id = get_session(request)
         if session_id is None:
@@ -98,7 +101,9 @@ class ParticipantDetail_view(APIView):
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    @swagger_auto_schema(request_body=ParticipantsSerializer)
+
+
+    @swagger_auto_schema(operation_description="Данный метод изменяет поля участника. Доступ: только если авторизован и модератор.", request_body=ParticipantsSerializer)
     def put(self, request, pk, format=None):
         session_id = get_session(request)
         if session_id is None:
@@ -120,6 +125,7 @@ class ParticipantDetail_view(APIView):
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(operation_description="Данный метод выполняет логическое удаление/восстановление участника. Доступ: только если авторизован и модератор.")
     def delete(self, request, pk, format = None):
         session_id = get_session(request)
         if session_id is None:

@@ -28,11 +28,11 @@ router = routers.DefaultRouter()
 
 schema_view = get_schema_view(
    openapi.Info(
-      title="Snippets API",
+      title="Регистрация участников на спортивное соревнование.",
       default_version='v1',
-      description="Test description",
+      description="Наше веб-приложение по регистрации участников на спортивное соревнование является удобным и интуитивно понятным инструментом, которым может воспользоваться любой организатор соревнований. Основная цель нашего приложения - упростить процесс регистрации для организаторов и участников, устранить бумажную волокиту и снизить время и усилия, требующиеся для проведения соревнования. ",
       terms_of_service="https://www.google.com/policies/terms/",
-      contact=openapi.Contact(email="contact@snippets.local"),
+      contact=openapi.Contact(email="asman2003pda45@gmail.com"),
       license=openapi.License(name="BSD License"),
    ),
    public=True,

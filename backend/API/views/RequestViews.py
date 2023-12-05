@@ -42,6 +42,7 @@ def getRequestPositionsWithParticipantData(serializer: PositionSerializer):
 class requestList_view(APIView):
     # получение списка заказов
     # можно только если авторизован
+    @swagger_auto_schema(operation_description="Данный метод возвращает список всех заказов(если модератор) или только список созданных пользователем заказов(клиент). Доступ: только если авторизован.")
     def get(self, request, format=None):
         session_id = get_session(request)
         if session_id is None:
@@ -64,7 +65,7 @@ class requestList_view(APIView):
     
     # отправка заказа пользователем
     # можно только если авторизован
-    @swagger_auto_schema(request_body=RequestSerializer)
+    @swagger_auto_schema(operation_description="Данный метод реализует отправку созданного заказа пользователем. Доступ: только если авторизован.", request_body=RequestSerializer)
     def put(self, request, format=None):
         session_id = get_session(request)
         if session_id is None:
@@ -84,6 +85,7 @@ class requestList_view(APIView):
     
     # удаление заказа пользователем
     # можно только если авторизован
+    @swagger_auto_schema(operation_description="Данный метод реализовывает удаление заказа пользователем. Доступ: только если авторизован.")
     def delete(self, request, format=None):
         session_id = get_session(request)
         if session_id is None:
@@ -102,6 +104,7 @@ class requestDetail_view(APIView):
     # получение заказа
     # можно получить свой заказ если авторизован
     # если авторизован и модератор, то можно получить любой заказ
+    @swagger_auto_schema(operation_description="Данный метод возвращает только свой заказ, если пользователь, или любой заказ, если модератор. Доступ: только если авторизован.")
     def get(self, request, pk, format=None):
         session_id = get_session(request)
         if session_id is None:
@@ -126,7 +129,7 @@ class requestDetail_view(APIView):
     
     # перевод заказа модератором на статус A или W
     # можно только если авторизован и модератор
-    @swagger_auto_schema(request_body=RequestSerializer)
+    @swagger_auto_schema(operation_description="Данный метод реализовывает перевод модератором на статус A или W. Доступ: только если авторизован.", request_body=RequestSerializer)
     def put(self, request, pk, format=None):
         session_id = get_session(request)
         if session_id is None:
