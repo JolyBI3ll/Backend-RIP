@@ -46,7 +46,7 @@ class requestList_view(APIView):
     def get(self, request, format=None):
         session_id = get_session(request)
         if session_id is None:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
+            return Response(status=status.HTTP_403_FORBIDDEN)
         
         currentUser = User.objects.get(username=session_storage.get(session_id).decode('utf-8'))
         if currentUser.is_moderator:
