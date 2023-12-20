@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
 import requests
 import redis
-from backend.settings import REDIS_HOST, REDIS_PORT, PAYMENT_PASSWORD
+from backend.settings import REDIS_HOST, REDIS_PORT, EVENT_PASSWORD
 
 from ..models import *
 from ..serializers import *
@@ -95,7 +95,7 @@ class requestList_view(APIView):
         new_status = "P"
         if checkStatusUpdate(application.status, new_status, isModer=False):
             url = "http://localhost:8080/result/"
-            params = {"Request_id": application.pk}
+            params = {"Request_id": application.pk, "token" : EVENT_PASSWORD}
             response = requests.post(url, json=params)
 
             application.status = new_status
@@ -178,8 +178,8 @@ class EventStatus_View(APIView):
     @swagger_auto_schema(request_body=RequestSerializer)
     def put(self, request, pk, format=None):
         event_status = request.data["status"]
-        password = request.data["password"]
-        if password != PAYMENT_PASSWORD:
+        token = request.data["token"]
+        if token != EVENT_PASSWORD:
             return Response(status=status.HTTP_403_FORBIDDEN)
         try:
             application = Request.objects.get(pk=pk)
