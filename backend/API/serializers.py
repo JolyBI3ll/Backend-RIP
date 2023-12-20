@@ -31,16 +31,25 @@ class UserLoginSerializer(serializers.Serializer):
     password = serializers.CharField(required=True)
 
 class RequestSerializer(ModelSerializer):
+    username = serializers.SerializerMethodField()
+    modername = serializers.SerializerMethodField()
+
     def get_fields(self):
         new_fields = OrderedDict()
         for name, field in super().get_fields().items():
             field.required = False
             new_fields[name] = field
         return new_fields
-
+    
+    def get_username(self, obj):
+        return obj.user_id.username
+    
+    def get_modername(self, obj):
+        return obj.moder_id.username
+    
     class Meta:
         model = Request
-        fields = '__all__'
+        fields = ["id","created", "send", "closed","eventstatus","status", "username", "modername"]
 
 class RequestParticipantSerializer(ModelSerializer):
     def get_fields(self):

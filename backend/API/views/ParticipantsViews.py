@@ -18,6 +18,7 @@ from api.minio.MinioClass import MinioClass
 
 import random
 
+from api.views.RequestViews import getRequestPositionsWithParticipantData
 
 session_storage = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT)
 
@@ -54,7 +55,7 @@ class Participantlist_view(APIView):
         return Response(List, status=status.HTTP_202_ACCEPTED)
     
     @swagger_auto_schema(operation_description="Данный метод добавляет нового участника. Доступ: все.", request_body=ParticipantsSerializer)
-    @method_permission_classes((IsModerator))
+    @method_permission_classes((IsModerator,))
     def post(self, request, format=None):
         serializer = ParticipantsSerializer(data=request.data)
         if serializer.is_valid():
@@ -75,31 +76,35 @@ class ParticipantDetail_view(APIView):
         session_id = get_session(request)
         if session_id is None:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+        
         userId = User.objects.get(username=session_storage.get(session_id).decode('utf-8'))
-
         RequestId = getOrderID(request)
-        if RequestId == -1:   
-            Request_new = {}      
-            Request_new['user_id'] = userId.pk
-            Request_new['moder_id'] = random.choice(User.objects.filter(is_moderator=True)).pk
-            requestserializer = RequestSerializer(data=Request_new)
-            if requestserializer.is_valid():
-                requestserializer.save()  
-                RequestId = requestserializer.data['id']
-            else:
-                return Response(RequestSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if RequestId == -1:   # если его нету
+            request_new = Request.objects.create(
+                user_id=userId,
+                moder_id=random.choice(User.objects.filter(is_moderator=True))
+            )
+            RequestId = request_new.pk
             
+        # теперь у нас точно есть черновик, поэтому мы создаём связь м-м (не уверен что следующие две строки вообще нужны)    
         if Request.objects.get(pk=RequestId).status != 'I' or len(RequestParticipant.objects.filter(Participant=pk).filter(Request=RequestId)) != 0:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        link = {}
-        link['Participant'] = pk
-        link['Request'] = RequestId
-        link['is_capitan'] = False
-        serializer = RequestParticipantSerializer(data=link)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        RequestParticipant.objects.create(
+            Participant_id=pk,
+            Request_id=RequestId,
+            is_capitan = False
+        )
+        
+        request_new = Request.objects.get(pk=RequestId)
+        requestserializer = RequestSerializer(request_new)
+
+        positions = RequestParticipant.objects.filter(Request=request_new.pk)
+        positionsSerializer = PositionSerializer(positions, many=True)
+
+        response = requestserializer.data
+        response['positions'] = getRequestPositionsWithParticipantData(positionsSerializer)
+        return Response(response, status=status.HTTP_202_ACCEPTED)
     
 
 

@@ -4,9 +4,9 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
-
+import requests
 import redis
-from backend.settings import REDIS_HOST, REDIS_PORT
+from backend.settings import REDIS_HOST, REDIS_PORT, PAYMENT_PASSWORD
 
 from ..models import *
 from ..serializers import *
@@ -39,6 +39,32 @@ def getRequestPositionsWithParticipantData(serializer: PositionSerializer):
         positions.append(positionData)
     return positions
 
+class Current_View(APIView):
+    @swagger_auto_schema(operation_description="Данный метод возвращает черновую заявку. Доступ: только если авторизован.")
+    def get(self, request, format=None):
+        session_id = get_session(request)
+        if session_id is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        
+        username = session_storage.get(session_id)
+        if username is None:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        currentUser = User.objects.get(username=session_storage.get(session_id).decode('utf-8'))
+        request_current = Request.objects.filter(user_id=currentUser).filter(status='I')
+        if request_current.exists():
+            application = request_current.first()
+            requestserializer = RequestSerializer(application)
+
+            positions = RequestParticipant.objects.filter(Request=application.pk)
+            positionsSerializer = PositionSerializer(positions, many=True)
+
+            response = requestserializer.data
+            response['positions'] = getRequestPositionsWithParticipantData(positionsSerializer)
+
+            return Response(response, status=status.HTTP_202_ACCEPTED)
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
 class requestList_view(APIView):
     # получение списка заказов
     # можно только если авторизован
@@ -55,13 +81,7 @@ class requestList_view(APIView):
             application = filterRequest(Request.objects.filter(user_id=currentUser.pk), request)
 
         serializer = RequestSerializer(application, many=True)
-        wideApplication = serializer.data
-        for i, wa in enumerate(serializer.data):
-            user = get_object_or_404(User, pk=wa['user_id'])
-            moder = get_object_or_404(User, pk=wa['moder_id'])
-            wideApplication[i]['user_name'] = user.username
-            wideApplication[i]['moder_name'] = moder.username
-        return Response(wideApplication, status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
     
     # отправка заказа пользователем
     # можно только если авторизован
@@ -74,12 +94,14 @@ class requestList_view(APIView):
         application = get_object_or_404(Request, pk=getOrderID(request))
         new_status = "P"
         if checkStatusUpdate(application.status, new_status, isModer=False):
+            url = "http://localhost:8080/result/"
+            params = {"Request_id": application.pk}
+            response = requests.post(url, json=params)
+
             application.status = new_status
             application.send = datetime.now()
             application.save()
             wideApplication = RequestSerializer(application).data
-            wideApplication['user_name'] = User.objects.get(pk = wideApplication['user_id']).username
-            wideApplication['moder_name'] = User.objects.get(pk = wideApplication['moder_id']).username
             return Response(wideApplication, status=status.HTTP_202_ACCEPTED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
     
@@ -119,9 +141,6 @@ class requestDetail_view(APIView):
             
             positions = RequestParticipant.objects.filter(Request=pk)
             positionsSerializer = PositionSerializer(positions, many=True)
-
-            wideApplication['user_name'] = User.objects.get(pk = wideApplication['user_id']).username
-            wideApplication['moder_name'] = User.objects.get(pk = wideApplication['moder_id']).username
             wideApplication['positions'] = getRequestPositionsWithParticipantData(positionsSerializer)
 
             return Response(wideApplication, status=status.HTTP_202_ACCEPTED)
@@ -150,7 +169,22 @@ class requestDetail_view(APIView):
             application.closed = datetime.now()
             application.save()
             wideApplication = RequestSerializer(application).data
-            wideApplication['user_name'] = User.objects.get(pk = wideApplication['user_id']).username
-            wideApplication['moder_name'] = User.objects.get(pk = wideApplication['moder_id']).username
             return Response(wideApplication, status=status.HTTP_202_ACCEPTED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
+    
+class EventStatus_View(APIView):
+    # изменение статуса оплаты заказа
+    # вызывается асинхронным сервисом
+    @swagger_auto_schema(request_body=RequestSerializer)
+    def put(self, request, pk, format=None):
+        event_status = request.data["status"]
+        password = request.data["password"]
+        if password != PAYMENT_PASSWORD:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        try:
+            application = Request.objects.get(pk=pk)
+            application.eventstatus = event_status
+            application.save()
+            return Response(status=status.HTTP_200_OK)
+        except Request.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)

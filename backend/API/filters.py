@@ -19,8 +19,13 @@ def filterCreated(queryset, request):
         higherdate = request.query_params.get('update')
     return queryset.filter(created__range=[lowerdate, higherdate])
 
+def filterRequestStatus(queryset, request):
+    if request.GET.get('status'):
+        return queryset.filter(status__in=list(request.GET.get('status')))
+    return queryset
+
 def filterParticipant(queryset, request):
-    return filtertitle(filterStatus(queryset, request), request)
+    return filtertitle(queryset, request)
 
 def filterRequest(queryset, request):
-    return filterCreated(filterStatus(queryset, request), request)
+    return filterCreated(filterRequestStatus(queryset, request), request)
