@@ -39,7 +39,7 @@ def getRequestPositionsWithParticipantData(serializer: PositionSerializer):
         positions.append(positionData)
     return positions
 
-class Current_View(APIView):
+class Current_Inp_View(APIView):
     @swagger_auto_schema(operation_description="Данный метод возвращает черновую заявку. Доступ: только если авторизован.")
     def get(self, request, format=None):
         session_id = get_session(request)
@@ -173,7 +173,7 @@ class requestDetail_view(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST)
     
 class EventStatus_View(APIView):
-    # изменение статуса оплаты заказа
+    # изменение статуса итога спорт мероприятия
     # вызывается асинхронным сервисом
     @swagger_auto_schema(request_body=RequestSerializer)
     def put(self, request, pk, format=None):
