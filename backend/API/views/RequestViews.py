@@ -177,7 +177,7 @@ class EventStatus_View(APIView):
     # вызывается асинхронным сервисом
     @swagger_auto_schema(request_body=RequestSerializer)
     def put(self, request, pk, format=None):
-        event_status = request.data["status"]
+        event_status = request.data["result"]
         token = request.data["token"]
         if token != EVENT_PASSWORD:
             return Response(status=status.HTTP_403_FORBIDDEN)

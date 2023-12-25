@@ -48,7 +48,7 @@ urlpatterns = [
 
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 
-    path('request/<int:pk>/status/', EventStatus_View.as_view(), name = 'event-status-update'),
+    path('request/<int:pk>/result/', EventStatus_View.as_view(), name = 'event-status-update'),
     path('accounts/login/', login_view, name='login'),
     path('accounts/logout/', logout_view, name='logout'),
     path('accounts/check/', check, name='check'),
