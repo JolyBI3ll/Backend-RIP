@@ -133,8 +133,8 @@ class requestDetail_view(APIView):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         currentUser = User.objects.get(username=session_storage.get(session_id).decode('utf-8'))
-        order_keys = Request.objects.filter(user_id=currentUser.pk).values_list('pk', flat=True)
-        if (pk in order_keys) or currentUser.is_moderator:
+        req_keys = Request.objects.filter(user_id=currentUser.pk).values_list('pk', flat=True)
+        if (pk in req_keys) or currentUser.is_moderator:
             application = get_object_or_404(Request, pk=pk)
             applicationSerializer = RequestSerializer(application)
             wideApplication = applicationSerializer.data
