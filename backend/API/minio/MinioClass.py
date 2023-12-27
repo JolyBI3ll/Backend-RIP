@@ -37,11 +37,14 @@ class MinioClass:
 
     def addImage(self, username: str, image_id: int, image_base64: str, image_extension: str):
         try:
-            image_stream = BytesIO(image_base64)
+            print('ДОБАВЛЕНИЕ')
+            image_data = b64decode(image_base64)
+            image_stream = BytesIO(image_data)
             self.client.put_object(bucket_name=username,
                                    object_name=f"{image_id}.{image_extension}",
                                    data=image_stream,
-                                   length=len(image_base64))
+                                   length=len(image_data))
+            print('ДОБАВЛЕНО')
         except S3Error as e:
             print("minio error occurred: ", e)
         except Exception as e:
@@ -65,8 +68,10 @@ class MinioClass:
 
     def removeImage(self, username: str, image_id: int, image_extension: str):
         try:
+            print('УДАЛЕНИЕ')
             self.client.remove_object(bucket_name=username,
                                       object_name=f"{image_id}.{image_extension}")
+            print('УДАЛЕНО')
         except S3Error as e:
             print("minio error occurred: ", e)
         except Exception as e:

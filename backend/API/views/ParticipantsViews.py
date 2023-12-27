@@ -21,25 +21,33 @@ import random
 from api.views.RequestViews import getRequestPositionsWithParticipantData
 
 session_storage = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT)
+minio = MinioClass()
 
-def getParticipantDataWithImage(serializer: ParticipantsSerializer):
-    minio = MinioClass()
+def getParticipantDataWithImage(serializer: RequestSerializer):
     ParticipantData = serializer.data
     ParticipantData.update({'image': minio.getImage('images', serializer.data['id'], serializer.data['file_extension'])})
     return ParticipantData
 
-def postParticipantImage(request, serializer: ParticipantsSerializer):
-    minio = MinioClass()
-    image_file = request.FILES.get('image')
-    byte_image = image_file.read()
-    minio.addImage('images', serializer.data['id'], byte_image, serializer.data['file_extension'])
+def postParticipantImage(request, serializer: RequestSerializer):
+    minio.addImage('images', serializer.data['id'], request.data['image'], serializer.data['file_extension'])
 
-def putParticipantImage(request, serializer: ParticipantsSerializer):
-    minio = MinioClass()
+# изменяет картинку продукта в minio на переданную в request
+def putParticipantImage(request, serializer: RequestSerializer):
     minio.removeImage('images', serializer.data['id'], serializer.data['file_extension'])
-    image_file = request.FILES.get('image')
-    byte_image = image_file.read()
-    minio.addImage('images', serializer.data['id'], byte_image, serializer.data['file_extension'])
+    minio.addImage('images', serializer.data['id'], request.data['image'], serializer.data['file_extension'])
+
+# def postParticipantImage(request, serializer: ParticipantsSerializer):
+#     minio = MinioClass()
+#     image_file = request.FILES.get('image')
+#     byte_image = image_file.read()
+#     minio.addImage('images', serializer.data['id'], byte_image, serializer.data['file_extension'])
+
+# def putParticipantImage(request, serializer: ParticipantsSerializer):
+#     minio = MinioClass()
+#     minio.removeImage('images', serializer.data['id'], serializer.data['file_extension'])
+#     image_file = request.FILES.get('image')
+#     byte_image = image_file.read()
+#     minio.addImage('images', serializer.data['id'], byte_image, serializer.data['file_extension'])
 
 
 class Participantlist_view(APIView):
@@ -49,14 +57,21 @@ class Participantlist_view(APIView):
         List = {
             'RequestId': requestid
         }
-        Participants = filterParticipant(Participant.objects.filter(status = 'A').order_by('pk'), request)
+        Participants = filterParticipant(Participant.objects.order_by('pk'), request)
         ParticipantsData = [getParticipantDataWithImage(ParticipantsSerializer(participant)) for participant in Participants]
         List ['Participants'] = ParticipantsData
         return Response(List, status=status.HTTP_202_ACCEPTED)
     
     @swagger_auto_schema(operation_description="Данный метод добавляет нового участника. Доступ: все.", request_body=ParticipantsSerializer)
-    @method_permission_classes((IsModerator,))
     def post(self, request, format=None):
+        session_id = get_session(request)
+        if session_id is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        
+        currentUser = User.objects.get(username=session_storage.get(session_id).decode('utf-8'))
+        if not currentUser.is_moderator:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
         serializer = ParticipantsSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
