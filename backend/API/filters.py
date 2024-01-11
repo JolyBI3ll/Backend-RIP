@@ -25,7 +25,7 @@ def filterRequestStatus(queryset, request):
     return queryset
 
 def filterParticipant(queryset, request):
-    return filtertitle(queryset, request)
+    return filtertitle(filterStatus(queryset, request), request)
 
 def filterRequest(queryset, request):
     return filterSended(filterRequestStatus(queryset, request), request)
