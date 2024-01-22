@@ -5,7 +5,5 @@
 
 Смежные репозитории:
 * фронтенд (React, RTK, Vite): https://github.com/JolyBI3ll/Frontend-RIP.git
-#### Репозиторий асинхронного сервиса результата соревновательного мероприятия
-https://github.com/JolyBI3ll/RIP-AsyncService.git
-#### Репозиторий нативного приложения
-https://github.com/JolyBI3ll/RIP-native.git
+* нативное приложение (React Native): https://github.com/JolyBI3ll/RIP-native.git
+* асинхронный сервис (Golang): https://github.com/JolyBI3ll/RIP-AsyncService.git
